@@ -1,6 +1,6 @@
 # Command Reference
 
-This reference consolidates the Cisco IOS commands demonstrated in the project. The screenshots often use valid IOS abbreviations; the commands below use expanded syntax where it improves readability without changing the configured values.
+This reference consolidates the Cisco IOS commands demonstrated in the project. The source material often uses valid IOS abbreviations; the commands below use expanded syntax where it improves readability without changing the configured values.
 
 ## Device baseline
 
@@ -353,6 +353,13 @@ show standby brief
 
 ## LACP EtherChannel and STP
 
+SAM-S6 trunks the two links shown in the LAN3 switching path:
+
+```cisco
+interface range GigabitEthernet0/1, FastEthernet0/23
+ switchport mode trunk
+```
+
 SAM-S5 and SAM-S7 use the same member ports:
 
 ```cisco
@@ -367,7 +374,6 @@ SAM-S7 is selected as the VLAN 1 root bridge:
 spanning-tree vlan 1 root primary
 ```
 
-The source does not include `show etherchannel summary` or `show spanning-tree` output.
 
 ## Syslog
 

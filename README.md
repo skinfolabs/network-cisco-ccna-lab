@@ -50,7 +50,7 @@ The lab uses Cisco Packet Tracer with ISR4331 routers, Catalyst 2960 switches, a
 | LAN3 | `10.10.10.0/24`; R3 `10.10.10.1`, R4 `10.10.10.2`, HSRP VIP `10.10.10.222` |
 | Wireless | `SamNet` using WPA2-Personal; wireless clients join the VLAN 10 addressing domain |
 
-> The usernames, passwords, IP addresses, and hostnames shown here are intentional Packet Tracer laboratory values. They must not be reused as production credentials or addressing without a separate security and capacity design.
+> The usernames and passwords are intentionally shown openly because this is an isolated Packet Tracer lab and the visible values make the configuration reproducible for learning and review. They are not real credentials and must not be reused on production devices.
 
 ## Tools and Technologies
 
@@ -99,7 +99,7 @@ Each network device receives a predictable hostname and a common baseline config
 
 Telnet appears in the initial source configuration as a learning step. It is later replaced with SSH-only VTY access because Telnet exposes credentials and commands in clear text.
 
-> `service password-encryption` provides reversible Cisco Type 7 obfuscation for some stored passwords; it is not a strong password-protection mechanism. Production administration should use strong secrets, AAA, SSH, and centralized identity controls.
+> `service password-encryption` provides reversible Cisco Type 7 obfuscation for some stored passwords; it is not a strong password-protection mechanism. For production, use `enable secret`, unique administrator accounts, SSH-only management, centralized TACACS+ or RADIUS, and securely managed credentials.
 
 **Implemented controls:**
 
@@ -113,82 +113,300 @@ Hostnames identify the device in prompts, logs, SSH keys, and troubleshooting ou
 
 > Consistent names reduce configuration mistakes when the same command sequence is repeated across many devices.
 
-![Switch Hostname Assignment](images/02-device-foundation/01-switch-hostname-assignment.png)
+#### SAM-S0
 
-<p><sub><strong>Screenshot 002 - Switch Hostname Assignment:</strong> Hostname changes applied across the initial Cisco switch set.</sub></p>
+The switch is assigned the `SAM-S0` hostname so it can be identified consistently in prompts, logs, and remote sessions.
 
-![Router Hostname Assignment](images/02-device-foundation/02-router-hostname-assignment.png)
+```cisco
+configure terminal
+hostname SAM-S0
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 003 - Router Hostname Assignment:</strong> Hostname changes applied to SAM-R0 through SAM-R3.</sub></p>
+#### SAM-S1
+
+The switch is assigned the `SAM-S1` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-S1
+end
+write memory
+```
+
+#### SAM-S3
+
+The switch is assigned the `SAM-S3` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-S3
+end
+write memory
+```
+
+#### SAM-S4
+
+The switch is assigned the `SAM-S4` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-S4
+end
+write memory
+```
+
+#### SAM-S5
+
+The switch is assigned the `SAM-S5` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-S5
+end
+write memory
+```
+
+#### SAM-S6
+
+The switch is assigned the `SAM-S6` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-S6
+end
+write memory
+```
+
+#### SAM-S7
+
+The switch is assigned the `SAM-S7` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-S7
+end
+write memory
+```
+
+#### SAM-R0
+
+The router is assigned the `SAM-R0` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-R0
+end
+write memory
+```
+
+#### SAM-R1
+
+The router is assigned the `SAM-R1` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-R1
+end
+write memory
+```
+
+#### SAM-R2
+
+The router is assigned the `SAM-R2` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-R2
+end
+write memory
+```
+
+#### SAM-R3
+
+The router is assigned the `SAM-R3` hostname so it can be identified consistently in prompts, logs, and remote sessions.
+
+```cisco
+configure terminal
+hostname SAM-R3
+end
+write memory
+```
 
 ### Configure initial local access controls
 
-Console and VTY lines receive the laboratory password, privileged access receives an enable secret, and the MOTD banner warns against unauthorized use. `exec-timeout 0 30` closes an idle line after 30 seconds; it does not repair an invalid command.
+Console and VTY lines receive the laboratory password, privileged access receives an enable secret, and the MOTD banner warns against unauthorized use. `exec-timeout 0 30` closes an unattended session after 30 seconds, reducing the risk of leaving administrative access open. `no ip domain-lookup` prevents the device from treating a mistyped command as a hostname and waiting for an unnecessary DNS lookup, while `logging synchronous` keeps system messages from interrupting command entry.
 
 > The initial `transport input telnet` setting is retained as historical lab evidence. The SSH chapter later replaces it with encrypted management, which is the appropriate operational state.
 
 ```cisco
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
 line console 0
+ logging synchronous
  exec-timeout 0 30
  password Samabcd
  login
+ exit
 line vty 0 4
  transport input telnet
  password Samabcd
  login
-enable secret Sam1234
-service password-encryption
+ exit
 ```
-
-![Console Password and Timeout](images/02-device-foundation/03-console-password-and-timeout.png)
-
-<p><sub><strong>Screenshot 004 - Console Password and Timeout:</strong> Console access protected with the lab password and a 30-second idle timeout.</sub></p>
-
-![Initial Telnet VTY Access](images/02-device-foundation/04-initial-telnet-vty-access.png)
-
-<p><sub><strong>Screenshot 005 - Initial Telnet VTY Access:</strong> Initial VTY line configuration using the laboratory Telnet password before the later SSH migration.</sub></p>
-
-![Enable Secret Configuration](images/02-device-foundation/05-enable-secret-configuration.png)
-
-<p><sub><strong>Screenshot 006 - Enable Secret Configuration:</strong> Privileged EXEC access protected with an enable secret.</sub></p>
-
-![Password Obfuscation Command](images/02-device-foundation/06-password-obfuscation-command.png)
-
-<p><sub><strong>Screenshot 007 - Password Obfuscation Command:</strong> Cisco service password-encryption enabled for stored line passwords.</sub></p>
-
-![Authorized Access Banner](images/02-device-foundation/07-authorized-access-banner.png)
-
-<p><sub><strong>Screenshot 008 - Authorized Access Banner:</strong> MOTD banner identifying authorized use and device ownership.</sub></p>
-
-![Synchronous Console Logging](images/02-device-foundation/08-logging-synchronous.png)
-
-<p><sub><strong>Screenshot 009 - Synchronous Console Logging:</strong> Console logging synchronized so system messages do not split command input.</sub></p>
-
-![Domain Lookup Disabled](images/02-device-foundation/09-disable-domain-lookup.png)
-
-<p><sub><strong>Screenshot 010 - Domain Lookup Disabled:</strong> DNS lookup disabled for unrecognized CLI input to prevent command-line delays.</sub></p>
 
 ### Apply the baseline to the routers
 
-The same baseline is applied to SAM-R0 through SAM-R3. These captures preserve each device-specific implementation rather than presenting one example as proof for every router.
+The same baseline is applied to SAM-R0 through SAM-R3. Each router configuration is written separately and in device order so the complete implementation can be reviewed without reading commands from images.
 
 > Repeated configuration should remain consistent, but each device still needs individual verification because a missing line on one router can interrupt remote administration or logging.
 
-![SAM-R0 Base Configuration](images/02-device-foundation/10-sam-r0-base-configuration.png)
+#### SAM-R0
 
-<p><sub><strong>Screenshot 011 - SAM-R0 Base Configuration:</strong> Full baseline console, banner, password, and VTY configuration captured for SAM-R0.</sub></p>
+This is the complete initial management baseline for router `SAM-R0`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
 
-![SAM-R1 Base Configuration](images/02-device-foundation/11-sam-r1-base-configuration.png)
+```cisco
+configure terminal
+hostname SAM-R0
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 012 - SAM-R1 Base Configuration:</strong> Full baseline console, banner, password, and VTY configuration captured for SAM-R1.</sub></p>
+#### SAM-R1
 
-![SAM-R3 Base Configuration](images/02-device-foundation/12-sam-r3-base-configuration.png)
+This is the complete initial management baseline for router `SAM-R1`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
 
-<p><sub><strong>Screenshot 013 - SAM-R3 Base Configuration:</strong> Full baseline console, banner, password, and VTY configuration captured for SAM-R3.</sub></p>
+```cisco
+configure terminal
+hostname SAM-R1
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
-![SAM-R2 Base Configuration](images/02-device-foundation/13-sam-r2-base-configuration.png)
+#### SAM-R2
 
-<p><sub><strong>Screenshot 014 - SAM-R2 Base Configuration:</strong> Full baseline console, banner, password, and VTY configuration captured for SAM-R2.</sub></p>
+This is the complete initial management baseline for router `SAM-R2`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
+
+```cisco
+configure terminal
+hostname SAM-R2
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
+
+#### SAM-R3
+
+This is the complete initial management baseline for router `SAM-R3`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
+
+```cisco
+configure terminal
+hostname SAM-R3
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
 ### Apply the baseline to the switches
 
@@ -196,33 +414,243 @@ SAM-S0, SAM-S1, and SAM-S3 through SAM-S7 receive the same management foundation
 
 > Switch management security is independent of data-plane forwarding. A switch can forward frames while still having incomplete or insecure administrative access.
 
-![SAM-S0 Base Configuration](images/02-device-foundation/14-sam-s0-base-configuration.png)
+#### SAM-S0
 
-<p><sub><strong>Screenshot 015 - SAM-S0 Base Configuration:</strong> Baseline management configuration captured for SAM-S0.</sub></p>
+This is the complete initial management baseline for switch `SAM-S0`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
 
-![SAM-S1 Base Configuration](images/02-device-foundation/15-sam-s1-base-configuration.png)
+```cisco
+configure terminal
+hostname SAM-S0
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 016 - SAM-S1 Base Configuration:</strong> Baseline management configuration captured for SAM-S1.</sub></p>
+#### SAM-S1
 
-![SAM-S3 Base Configuration](images/02-device-foundation/16-sam-s3-base-configuration.png)
+This is the complete initial management baseline for switch `SAM-S1`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
 
-<p><sub><strong>Screenshot 017 - SAM-S3 Base Configuration:</strong> Baseline management configuration captured for SAM-S3.</sub></p>
+```cisco
+configure terminal
+hostname SAM-S1
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
-![SAM-S4 Base Configuration](images/02-device-foundation/17-sam-s4-base-configuration.png)
+#### SAM-S3
 
-<p><sub><strong>Screenshot 018 - SAM-S4 Base Configuration:</strong> Baseline management configuration captured for SAM-S4.</sub></p>
+This is the complete initial management baseline for switch `SAM-S3`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
 
-![SAM-S6 Base Configuration](images/02-device-foundation/18-sam-s6-base-configuration.png)
+```cisco
+configure terminal
+hostname SAM-S3
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 019 - SAM-S6 Base Configuration:</strong> Baseline management configuration captured for SAM-S6.</sub></p>
+#### SAM-S4
 
-![SAM-S5 Base Configuration](images/02-device-foundation/19-sam-s5-base-configuration.png)
+This is the complete initial management baseline for switch `SAM-S4`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
 
-<p><sub><strong>Screenshot 020 - SAM-S5 Base Configuration:</strong> Baseline management configuration captured for SAM-S5.</sub></p>
+```cisco
+configure terminal
+hostname SAM-S4
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
-![SAM-S7 Base Configuration](images/02-device-foundation/20-sam-s7-base-configuration.png)
+#### SAM-S5
 
-<p><sub><strong>Screenshot 021 - SAM-S7 Base Configuration:</strong> Baseline management configuration captured for SAM-S7.</sub></p>
+This is the complete initial management baseline for switch `SAM-S5`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
+
+```cisco
+configure terminal
+hostname SAM-S5
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
+
+#### SAM-S6
+
+This is the complete initial management baseline for switch `SAM-S6`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
+
+```cisco
+configure terminal
+hostname SAM-S6
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
+
+#### SAM-S7
+
+This is the complete initial management baseline for switch `SAM-S7`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
+
+```cisco
+configure terminal
+hostname SAM-S7
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
 ---------
 
@@ -246,17 +674,47 @@ The VLAN databases on SAM-S0, SAM-S1, and SAM-S3 are populated with VLAN 10 (`YE
 
 > A VLAN name is operational documentation; the numeric VLAN ID is the value carried in the 802.1Q tag.
 
-![SAM-S3 VLAN Database](images/03-vlan-segmentation/01-sam-s3-vlan-database.png)
+#### SAM-S0
 
-<p><sub><strong>Screenshot 022 - SAM-S3 VLAN Database:</strong> VLAN 10 named YELLOW and VLAN 20 named BLUE on SAM-S3.</sub></p>
+SAM-S0 creates both user VLANs before its access ports and trunks are assigned.
 
-![SAM-S1 VLAN Database](images/03-vlan-segmentation/02-sam-s1-vlan-database.png)
+```cisco
+configure terminal
+vlan 10
+ name YELLOW
+vlan 20
+ name BLUE
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 023 - SAM-S1 VLAN Database:</strong> VLAN 10 and VLAN 20 created and named on SAM-S1.</sub></p>
+#### SAM-S1
 
-![SAM-S0 VLAN Database](images/03-vlan-segmentation/03-sam-s0-vlan-database.png)
+SAM-S1 uses the same VLAN IDs and names so tagged traffic remains consistent across the switching path.
 
-<p><sub><strong>Screenshot 024 - SAM-S0 VLAN Database:</strong> VLAN 10 and VLAN 20 created and named on SAM-S0.</sub></p>
+```cisco
+configure terminal
+vlan 10
+ name YELLOW
+vlan 20
+ name BLUE
+end
+write memory
+```
+
+#### SAM-S3
+
+SAM-S3 creates the same user VLANs before carrying them toward the router-on-a-stick gateway.
+
+```cisco
+configure terminal
+vlan 10
+ name YELLOW
+vlan 20
+ name BLUE
+end
+write memory
+```
 
 ### Assign access ports to VLAN 10 and VLAN 20
 
@@ -264,21 +722,39 @@ Endpoint-facing FastEthernet ports are forced into access mode and assigned to t
 
 > An incorrect access VLAN can place a client in the wrong IP subnet, bypass the intended ACL source classification, or prevent DHCP from reaching the correct pool.
 
-![SAM-S0 VLAN 20 Access Port](images/03-vlan-segmentation/04-sam-s0-vlan20-access-port.png)
+#### SAM-S0
 
-<p><sub><strong>Screenshot 025 - SAM-S0 VLAN 20 Access Port:</strong> FastEthernet0/5 assigned as an access port in VLAN 20.</sub></p>
+SAM-S0 places FastEthernet0/1-2 in VLAN 10 and FastEthernet0/5 in VLAN 20.
 
-![SAM-S0 VLAN 10 Access Range](images/03-vlan-segmentation/05-sam-s0-vlan10-access-range.png)
+```cisco
+configure terminal
+interface range FastEthernet0/1 - 2
+ switchport mode access
+ switchport access vlan 10
+ exit
+interface FastEthernet0/5
+ switchport mode access
+ switchport access vlan 20
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 026 - SAM-S0 VLAN 10 Access Range:</strong> FastEthernet0/1-2 assigned to VLAN 10.</sub></p>
+#### SAM-S1
 
-![SAM-S1 VLAN 10 Access Port](images/03-vlan-segmentation/06-sam-s1-vlan10-access-port.png)
+SAM-S1 uses the opposite endpoint distribution: FastEthernet0/5 joins VLAN 10 and FastEthernet0/1-2 join VLAN 20.
 
-<p><sub><strong>Screenshot 027 - SAM-S1 VLAN 10 Access Port:</strong> FastEthernet0/5 assigned as an access port in VLAN 10.</sub></p>
-
-![SAM-S1 VLAN 20 Access Range](images/03-vlan-segmentation/07-sam-s1-vlan20-access-range.png)
-
-<p><sub><strong>Screenshot 028 - SAM-S1 VLAN 20 Access Range:</strong> SAM-S1 access interfaces assigned to VLAN 20.</sub></p>
+```cisco
+configure terminal
+interface FastEthernet0/5
+ switchport mode access
+ switchport access vlan 10
+ exit
+interface range FastEthernet0/1 - 2
+ switchport mode access
+ switchport access vlan 20
+end
+write memory
+```
 
 ### Configure and validate hardened trunks
 
@@ -286,35 +762,83 @@ The switch uplinks are placed in trunk mode, VLAN 99 is selected as the native V
 
 > A native-VLAN mismatch can leak untagged traffic into the wrong VLAN and produce difficult Layer 2 troubleshooting symptoms.
 
+#### SAM-S0
+
+SAM-S0 creates native VLAN 99 and statically configures its uplinks as non-negotiating trunks.
+
 ```cisco
-switchport mode trunk
-switchport trunk native vlan 99
-switchport nonegotiate
+configure terminal
+vlan 99
+ name Native
+interface FastEthernet0/3
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+ exit
+interface GigabitEthernet0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+end
+write memory
 ```
 
-![SAM-S1 Native VLAN 99](images/03-vlan-segmentation/08-sam-s1-native-vlan99.png)
+#### SAM-S1
 
-<p><sub><strong>Screenshot 029 - SAM-S1 Native VLAN 99:</strong> VLAN 99 created and named Native on SAM-S1.</sub></p>
+SAM-S1 applies the same native VLAN and static-trunk policy to both GigabitEthernet uplinks.
 
-![SAM-S1 Secured Trunk](images/03-vlan-segmentation/09-sam-s1-secured-trunk.png)
+```cisco
+configure terminal
+vlan 99
+ name Native
+interface range GigabitEthernet0/1 - 2
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 030 - SAM-S1 Secured Trunk:</strong> SAM-S1 trunk configured with native VLAN 99 and DTP disabled.</sub></p>
+#### SAM-S3
 
-![SAM-S0 Secured Trunk](images/03-vlan-segmentation/10-sam-s0-secured-trunk.png)
+SAM-S3 carries the user VLANs through FastEthernet0/24 and its GigabitEthernet uplinks.
 
-<p><sub><strong>Screenshot 031 - SAM-S0 Secured Trunk:</strong> SAM-S0 trunk configured with native VLAN 99 and DTP disabled.</sub></p>
+```cisco
+configure terminal
+interface FastEthernet0/24
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+ exit
+interface range GigabitEthernet0/1 - 2
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+end
+write memory
+```
 
-![SAM-S0 Trunk Validation](images/03-vlan-segmentation/11-sam-s0-trunk-validation.png)
+#### Trunk validation
 
-<p><sub><strong>Screenshot 032 - SAM-S0 Trunk Validation:</strong> SAM-S0 trunk table showing 802.1Q operation and native VLAN 99.</sub></p>
+The `show interfaces trunk` output confirms 802.1Q operation and native VLAN 99 on every participating link.
 
-![SAM-S1 Trunk Validation](images/03-vlan-segmentation/12-sam-s1-trunk-validation.png)
+```text
+SAM-S0# show interfaces trunk
+Port      Mode  Encapsulation  Status    Native vlan
+Fa0/3     on    802.1q         trunking  99
+Gi0/1     on    802.1q         trunking  99
 
-<p><sub><strong>Screenshot 033 - SAM-S1 Trunk Validation:</strong> SAM-S1 trunk table showing both links using native VLAN 99.</sub></p>
+SAM-S1# show interfaces trunk
+Port      Mode  Encapsulation  Status    Native vlan
+Gi0/1     on    802.1q         trunking  99
+Gi0/2     on    802.1q         trunking  99
 
-![SAM-S3 Trunk Validation](images/03-vlan-segmentation/13-sam-s3-trunk-validation.png)
-
-<p><sub><strong>Screenshot 034 - SAM-S3 Trunk Validation:</strong> SAM-S3 trunk table showing Fa0/24 and uplinks operating with native VLAN 99.</sub></p>
+SAM-S3# show interfaces trunk
+Port      Mode  Encapsulation  Status    Native vlan
+Fa0/24    on    802.1q         trunking  99
+Gi0/1     on    802.1q         trunking  99
+Gi0/2     on    802.1q         trunking  99
+```
 
 ---------
 
@@ -338,29 +862,35 @@ VLAN 10 uses `192.168.10.0/24` with gateway `192.168.10.1`, while VLAN 20 uses `
 
 > DHCP options must match the routed interface for the client VLAN. A lease can be assigned successfully while still producing unusable connectivity if the gateway or DNS option is incorrect.
 
-![DHCP Pool Declaration](images/04-dhcp-router-on-a-stick/01-dhcp-pool-declaration.png)
+#### SAM-R0
 
-<p><sub><strong>Screenshot 035 - DHCP Pool Declaration:</strong> Router-based DHCP pools declared for VLAN 10 and VLAN 20.</sub></p>
+SAM-R0 creates one tagged gateway and one DHCP pool for each user VLAN. The gateway addresses are excluded so they cannot be leased to clients.
 
-![VLAN 20 Pool and Options](images/04-dhcp-router-on-a-stick/02-vlan20-pool-and-options.png)
-
-<p><sub><strong>Screenshot 036 - VLAN 20 Pool and Options:</strong> VLAN 20 scope combined with gateway and DNS option planning.</sub></p>
-
-![VLAN 10 DHCP Options](images/04-dhcp-router-on-a-stick/03-vlan10-dhcp-options.png)
-
-<p><sub><strong>Screenshot 037 - VLAN 10 DHCP Options:</strong> VLAN 10 network, gateway, DNS server, and excluded gateway address configured.</sub></p>
-
-![VLAN 20 DHCP Options](images/04-dhcp-router-on-a-stick/04-vlan20-dhcp-options.png)
-
-<p><sub><strong>Screenshot 038 - VLAN 20 DHCP Options:</strong> VLAN 20 network, gateway, DNS server, and excluded gateway address configured.</sub></p>
-
-![VLAN 20 Router Subinterface](images/04-dhcp-router-on-a-stick/05-vlan20-router-subinterface.png)
-
-<p><sub><strong>Screenshot 039 - VLAN 20 Router Subinterface:</strong> 802.1Q subinterface GigabitEthernet0/0/0.20 configured with the VLAN 20 gateway.</sub></p>
-
-![VLAN 10 Router Subinterface](images/04-dhcp-router-on-a-stick/06-vlan10-router-subinterface.png)
-
-<p><sub><strong>Screenshot 040 - VLAN 10 Router Subinterface:</strong> 802.1Q subinterface GigabitEthernet0/0/0.10 configured with the VLAN 10 gateway.</sub></p>
+```cisco
+configure terminal
+interface GigabitEthernet0/0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+ exit
+interface GigabitEthernet0/0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+ exit
+ip dhcp pool VLAN10
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 172.19.0.100
+ exit
+ip dhcp excluded-address 192.168.10.1
+ip dhcp pool VLAN20
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.1
+ dns-server 172.19.0.100
+ exit
+ip dhcp excluded-address 192.168.20.1
+end
+write memory
+```
 
 ### Connect the router through the switch trunk
 
@@ -368,17 +898,19 @@ SAM-S3 FastEthernet0/24 carries the tagged VLAN traffic to SAM-R0. The consolida
 
 > The physical router interface remains shared, but each subinterface processes only frames carrying its configured 802.1Q VLAN tag.
 
-![SAM-S3 Router Trunk](images/04-dhcp-router-on-a-stick/07-sam-s3-router-trunk.png)
+#### SAM-S3
 
-<p><sub><strong>Screenshot 041 - SAM-S3 Router Trunk:</strong> FastEthernet0/24 configured as the trunk toward the router-on-a-stick gateway.</sub></p>
+SAM-S3 FastEthernet0/24 is the static trunk toward SAM-R0, allowing both tagged user VLANs to reach their matching router subinterfaces.
 
-![VLAN 20 DHCP Configuration](images/04-dhcp-router-on-a-stick/08-vlan20-dhcp-complete-config.png)
-
-<p><sub><strong>Screenshot 042 - VLAN 20 DHCP Configuration:</strong> Complete VLAN 20 subinterface and DHCP scope sequence.</sub></p>
-
-![VLAN 10 DHCP Configuration](images/04-dhcp-router-on-a-stick/09-vlan10-dhcp-complete-config.png)
-
-<p><sub><strong>Screenshot 043 - VLAN 10 DHCP Configuration:</strong> Complete VLAN 10 subinterface and DHCP scope sequence.</sub></p>
+```cisco
+configure terminal
+interface FastEthernet0/24
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+end
+write memory
+```
 
 ### Validate client address allocation
 
@@ -386,29 +918,29 @@ PC0, PC1, and PC5 receive VLAN 10 addresses; PC2, PC3, and PC4 receive VLAN 20 a
 
 > A DHCP lease validates scope delivery. Routing and policy behavior are verified separately with the later ping, SSH, and browser tests.
 
-![PC0 DHCP Lease](images/04-dhcp-router-on-a-stick/10-pc0-dhcp-lease.png)
+![PC0 DHCP Lease](images/02-dhcp-router-on-a-stick/01-pc0-dhcp-lease.png)
 
-<p><sub><strong>Screenshot 044 - PC0 DHCP Lease:</strong> PC0 receives 192.168.10.2 with the VLAN 10 gateway and laboratory DNS server.</sub></p>
+<p><sub><strong>Screenshot 002 - PC0 DHCP Lease:</strong> PC0 receives 192.168.10.2 with the VLAN 10 gateway and laboratory DNS server.</sub></p>
 
-![PC1 DHCP Lease](images/04-dhcp-router-on-a-stick/11-pc1-dhcp-lease.png)
+![PC1 DHCP Lease](images/02-dhcp-router-on-a-stick/02-pc1-dhcp-lease.png)
 
-<p><sub><strong>Screenshot 045 - PC1 DHCP Lease:</strong> PC1 receives 192.168.10.3 from the VLAN 10 pool.</sub></p>
+<p><sub><strong>Screenshot 003 - PC1 DHCP Lease:</strong> PC1 receives 192.168.10.3 from the VLAN 10 pool.</sub></p>
 
-![PC2 DHCP Lease](images/04-dhcp-router-on-a-stick/12-pc2-dhcp-lease.png)
+![PC2 DHCP Lease](images/02-dhcp-router-on-a-stick/03-pc2-dhcp-lease.png)
 
-<p><sub><strong>Screenshot 046 - PC2 DHCP Lease:</strong> PC2 receives 192.168.20.2 from the VLAN 20 pool.</sub></p>
+<p><sub><strong>Screenshot 004 - PC2 DHCP Lease:</strong> PC2 receives 192.168.20.2 from the VLAN 20 pool.</sub></p>
 
-![PC3 DHCP Lease](images/04-dhcp-router-on-a-stick/13-pc3-dhcp-lease.png)
+![PC3 DHCP Lease](images/02-dhcp-router-on-a-stick/04-pc3-dhcp-lease.png)
 
-<p><sub><strong>Screenshot 047 - PC3 DHCP Lease:</strong> PC3 receives 192.168.20.3 from the VLAN 20 pool.</sub></p>
+<p><sub><strong>Screenshot 005 - PC3 DHCP Lease:</strong> PC3 receives 192.168.20.3 from the VLAN 20 pool.</sub></p>
 
-![PC5 DHCP Lease](images/04-dhcp-router-on-a-stick/14-pc5-dhcp-lease.png)
+![PC5 DHCP Lease](images/02-dhcp-router-on-a-stick/05-pc5-dhcp-lease.png)
 
-<p><sub><strong>Screenshot 048 - PC5 DHCP Lease:</strong> PC5 receives 192.168.10.4 from the VLAN 10 pool.</sub></p>
+<p><sub><strong>Screenshot 006 - PC5 DHCP Lease:</strong> PC5 receives 192.168.10.4 from the VLAN 10 pool.</sub></p>
 
-![PC4 DHCP Lease](images/04-dhcp-router-on-a-stick/15-pc4-dhcp-lease.png)
+![PC4 DHCP Lease](images/02-dhcp-router-on-a-stick/06-pc4-dhcp-lease.png)
 
-<p><sub><strong>Screenshot 049 - PC4 DHCP Lease:</strong> PC4 receives 192.168.20.4 from the VLAN 20 pool.</sub></p>
+<p><sub><strong>Screenshot 007 - PC4 DHCP Lease:</strong> PC4 receives 192.168.20.4 from the VLAN 20 pool.</sub></p>
 
 ---------
 
@@ -432,13 +964,13 @@ The DNS server uses `172.19.0.100/16` and the web server uses `172.19.0.200/16`;
 
 > Static service addresses prevent a DNS record or logging destination from becoming stale after a lease change.
 
-![DNS Server Static Address](images/05-server-dns-wireless/01-dns-server-static-address.png)
+![DNS Server Static Address](images/03-server-dns-wireless/01-dns-server-static-address.png)
 
-<p><sub><strong>Screenshot 050 - DNS Server Static Address:</strong> DNS server configured as 172.19.0.100/16 with gateway 172.19.0.1.</sub></p>
+<p><sub><strong>Screenshot 008 - DNS Server Static Address:</strong> DNS server configured as 172.19.0.100/16 with gateway 172.19.0.1.</sub></p>
 
-![Web Server Static Address](images/05-server-dns-wireless/02-web-server-static-address.png)
+![Web Server Static Address](images/03-server-dns-wireless/02-web-server-static-address.png)
 
-<p><sub><strong>Screenshot 051 - Web Server Static Address:</strong> Web server configured as 172.19.0.200/16 and pointed to the laboratory DNS server.</sub></p>
+<p><sub><strong>Screenshot 009 - Web Server Static Address:</strong> Web server configured as 172.19.0.200/16 and pointed to the laboratory DNS server.</sub></p>
 
 ### Publish the internal web name
 
@@ -446,9 +978,9 @@ Packet Tracer DNS is enabled and an A record maps `www.sam.com` directly to `172
 
 > DNS resolution proves name-to-address mapping. The browser tests later confirm that the HTTP service is reachable at the resolved address.
 
-![Web DNS A Record](images/05-server-dns-wireless/03-web-dns-a-record.png)
+![Web DNS A Record](images/03-server-dns-wireless/03-web-dns-a-record.png)
 
-<p><sub><strong>Screenshot 052 - Web DNS A Record:</strong> A record maps www.sam.com to 172.19.0.200.</sub></p>
+<p><sub><strong>Screenshot 010 - Web DNS A Record:</strong> A record maps www.sam.com to 172.19.0.200.</sub></p>
 
 ### Configure the WLAN profile and obtain a lease
 
@@ -456,13 +988,13 @@ The `SamNet` WLAN uses WPA2-Personal and places the wireless client in the VLAN 
 
 > The controller profile defines wireless authentication and client forwarding; the wired trunk and DHCP configuration still determine whether the client can reach the routed network.
 
-![SamNet WLAN Profile](images/05-server-dns-wireless/04-samnet-wlan-profile.png)
+![SamNet WLAN Profile](images/03-server-dns-wireless/04-samnet-wlan-profile.png)
 
-<p><sub><strong>Screenshot 053 - SamNet WLAN Profile:</strong> Wireless profile configured for SamNet with WPA2-Personal and the management setting shown in Packet Tracer.</sub></p>
+<p><sub><strong>Screenshot 011 - SamNet WLAN Profile:</strong> Wireless profile configured for SamNet with WPA2-Personal and the management setting shown in Packet Tracer.</sub></p>
 
-![Wireless Client DHCP Lease](images/05-server-dns-wireless/05-wireless-client-dhcp-lease.png)
+![Wireless Client DHCP Lease](images/03-server-dns-wireless/05-wireless-client-dhcp-lease.png)
 
-<p><sub><strong>Screenshot 054 - Wireless Client DHCP Lease:</strong> Laptop receives 192.168.10.5, the VLAN 10 gateway, and DNS settings over WLAN.</sub></p>
+<p><sub><strong>Screenshot 012 - Wireless Client DHCP Lease:</strong> Laptop receives 192.168.10.5, the VLAN 10 gateway, and DNS settings over WLAN.</sub></p>
 
 ### Build and validate the wireless client path
 
@@ -470,37 +1002,64 @@ FlexConnect options are enabled, a compatible wireless module is installed in th
 
 > The visible pre-shared key is retained as laboratory data only. A real key must not be committed to a public repository.
 
-![FlexConnect Settings](images/05-server-dns-wireless/06-flexconnect-settings.png)
+![FlexConnect Settings](images/03-server-dns-wireless/06-flexconnect-settings.png)
 
-<p><sub><strong>Screenshot 055 - FlexConnect Settings:</strong> Local switching and local authentication enabled for the lightweight access-point workflow.</sub></p>
+<p><sub><strong>Screenshot 013 - FlexConnect Settings:</strong> Local switching and local authentication enabled for the lightweight access-point workflow.</sub></p>
 
-![Laptop Wireless Module](images/05-server-dns-wireless/07-laptop-wireless-module.png)
+![Laptop Wireless Module](images/03-server-dns-wireless/07-laptop-wireless-module.png)
 
-<p><sub><strong>Screenshot 056 - Laptop Wireless Module:</strong> Compatible wireless module installed in the Packet Tracer laptop.</sub></p>
+<p><sub><strong>Screenshot 014 - Laptop Wireless Module:</strong> Compatible wireless module installed in the Packet Tracer laptop.</sub></p>
 
-![Wireless Client and Access Point](images/05-server-dns-wireless/08-wireless-client-and-ap.png)
+![Wireless Client and Access Point](images/03-server-dns-wireless/08-wireless-client-and-ap.png)
 
-<p><sub><strong>Screenshot 057 - Wireless Client and Access Point:</strong> Laptop associated through the lightweight access point.</sub></p>
+<p><sub><strong>Screenshot 015 - Wireless Client and Access Point:</strong> Laptop associated through the lightweight access point.</sub></p>
 
-![SamNet Discovery](images/05-server-dns-wireless/09-samnet-discovery.png)
+![SamNet Discovery](images/03-server-dns-wireless/09-samnet-discovery.png)
 
-<p><sub><strong>Screenshot 058 - SamNet Discovery:</strong> Laptop detects the SamNet WLAN with WPA2-PSK security.</sub></p>
+<p><sub><strong>Screenshot 016 - SamNet Discovery:</strong> Laptop detects the SamNet WLAN with WPA2-PSK security.</sub></p>
 
-![SamNet WPA2 Authentication](images/05-server-dns-wireless/10-samnet-wpa2-authentication.png)
+![SamNet WPA2 Authentication](images/03-server-dns-wireless/10-samnet-wpa2-authentication.png)
 
-<p><sub><strong>Screenshot 059 - SamNet WPA2 Authentication:</strong> Laboratory pre-shared key entered to join the wireless network.</sub></p>
+<p><sub><strong>Screenshot 017 - SamNet WPA2 Authentication:</strong> Laboratory pre-shared key entered to join the wireless network.</sub></p>
 
-![Access Point Address Reservation](images/05-server-dns-wireless/11-access-point-address-reservation.png)
+#### SAM-R0
 
-<p><sub><strong>Screenshot 060 - Access Point Address Reservation:</strong> 192.168.10.129 excluded from the DHCP pool for infrastructure use.</sub></p>
+The intended access-point address is excluded from DHCP so it remains available for infrastructure use.
 
-![Access Point Switch Trunk](images/05-server-dns-wireless/12-access-point-switch-trunk.png)
+```cisco
+configure terminal
+ip dhcp excluded-address 192.168.10.129
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 061 - Access Point Switch Trunk:</strong> SAM-S0 port toward the access point configured as a trunk with native VLAN 99.</sub></p>
+#### SAM-S0
 
-![Controller Switch Trunk](images/05-server-dns-wireless/13-controller-switch-trunk.png)
+SAM-S0 statically trunks the access-point connection and uses VLAN 99 as the native VLAN.
 
-<p><sub><strong>Screenshot 062 - Controller Switch Trunk:</strong> SAM-S1 port toward the wireless controller configured as a trunk with native VLAN 99.</sub></p>
+```cisco
+configure terminal
+interface FastEthernet0/3
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+end
+write memory
+```
+
+#### SAM-S1
+
+SAM-S1 applies the matching trunk policy to the wireless-controller connection.
+
+```cisco
+configure terminal
+interface GigabitEthernet0/2
+ switchport mode trunk
+ switchport trunk native vlan 99
+ switchport nonegotiate
+end
+write memory
+```
 
 ---------
 
@@ -524,13 +1083,34 @@ Unused SAM-S4 ports are shut down before the three active interfaces are placed 
 
 > An overly broad interface range can disable legitimate uplinks. Interface selections must be checked against the physical topology before applying a shutdown command.
 
-![Unused Switch Ports Disabled](images/06-port-security/01-disable-unused-switch-ports.png)
+#### SAM-S4
 
-<p><sub><strong>Screenshot 063 - Unused Switch Ports Disabled:</strong> Unused SAM-S4 interfaces shut down to reduce unauthorized physical access.</sub></p>
+SAM-S4 shuts down unused interfaces and protects the three active access ports with sticky MAC learning, a one-address limit, and restrict violation mode.
 
-![Sticky Port Security](images/06-port-security/02-sticky-port-security.png)
+```cisco
+configure terminal
+interface range FastEthernet0/3 - 24, GigabitEthernet0/2
+ shutdown
+ exit
+interface range FastEthernet0/1 - 2, GigabitEthernet0/1
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 064 - Sticky Port Security:</strong> Access ports limited to one learned MAC address with restrict violation mode.</sub></p>
+The operational table records one learned address on each secured port and eight violations on FastEthernet0/2.
+
+```text
+SAM-S4# show port-security
+Secure Port  MaxSecureAddr  CurrentAddr  SecurityViolation  Security Action
+Fa0/1        1              1            0                  Restrict
+Fa0/2        1              1            8                  Restrict
+Gi0/1        1              1            0                  Restrict
+```
 
 ### Review Port Security state and limitations
 
@@ -538,29 +1118,17 @@ Unused SAM-S4 ports are shut down before the three active interfaces are placed 
 
 > The violation counter is the relevant control evidence. A generic timeout can also result from an incorrect address, missing route, or unavailable endpoint.
 
-![Port Security Status](images/06-port-security/03-port-security-status.png)
+![Initial Port Security Ping Test](images/04-port-security/01-initial-port-security-ping.png)
 
-<p><sub><strong>Screenshot 065 - Port Security Status:</strong> show port-security output lists secured interfaces and restrict actions.</sub></p>
+<p><sub><strong>Screenshot 018 - Initial Port Security Ping Test:</strong> The original test targets 172.168.0.1; this address is outside the documented topology and is retained as limited lab evidence.</sub></p>
 
-![Initial Port Security Ping Test](images/06-port-security/04-initial-port-security-ping.png)
+![Server Room Access Topology](images/04-port-security/02-server-room-access-topology.png)
 
-<p><sub><strong>Screenshot 066 - Initial Port Security Ping Test:</strong> The original test targets 172.168.0.1; this address is outside the documented topology and is retained as limited lab evidence.</sub></p>
+<p><sub><strong>Screenshot 019 - Server Room Access Topology:</strong> Laptop and server connections shown around the protected SAM-S4 access switch.</sub></p>
 
-![Port Security Violation Counter](images/06-port-security/05-port-security-violation-counter.png)
+![Routed Core Topology](images/04-port-security/03-routed-core-topology.png)
 
-<p><sub><strong>Screenshot 067 - Port Security Violation Counter:</strong> SecurityViolation count records eight events on one protected access port.</sub></p>
-
-![Server Room Access Topology](images/06-port-security/06-server-room-access-topology.png)
-
-<p><sub><strong>Screenshot 068 - Server Room Access Topology:</strong> Laptop and server connections shown around the protected SAM-S4 access switch.</sub></p>
-
-![Restrict Violation Mode](images/06-port-security/07-restrict-violation-mode.png)
-
-<p><sub><strong>Screenshot 069 - Restrict Violation Mode:</strong> Port-security restrict mode limits unauthorized frames without err-disabling the interface.</sub></p>
-
-![Routed Core Topology](images/06-port-security/08-routed-core-topology.png)
-
-<p><sub><strong>Screenshot 070 - Routed Core Topology:</strong> Transit networks between SAM-R0, SAM-R1, and SAM-R2 before OSPF activation.</sub></p>
+<p><sub><strong>Screenshot 020 - Routed Core Topology:</strong> Transit networks between SAM-R0, SAM-R1, and SAM-R2 before OSPF activation.</sub></p>
 
 ---------
 
@@ -584,21 +1152,65 @@ The `172.31.0.0/16` and `209.165.200.0/24` networks connect SAM-R0, SAM-R1, and 
 
 > Dynamic routing cannot repair an incorrect connected-link mask. Both ends must agree on the subnet before a neighbor relationship can form.
 
-![SAM-R1 209.165.200.0 Link](images/07-ospf-routing/01-sam-r1-west-link.png)
+#### SAM-R0
 
-<p><sub><strong>Screenshot 071 - SAM-R1 209.165.200.0 Link:</strong> SAM-R1 GigabitEthernet0/0/1 configured as 209.165.200.1/24.</sub></p>
+SAM-R0 addresses the transit link to SAM-R1 and advertises both user VLANs and the transit network in OSPF area 0.
 
-![SAM-R0 Transit Link](images/07-ospf-routing/02-sam-r0-transit-link.png)
+```cisco
+configure terminal
+interface GigabitEthernet0/0/1
+ ip address 172.31.0.1 255.255.0.0
+ no shutdown
+ exit
+router ospf 1
+ network 192.168.10.0 0.0.0.255 area 0
+ network 192.168.20.0 0.0.0.255 area 0
+ network 172.31.0.0 0.0.255.255 area 0
+ passive-interface GigabitEthernet0/0/0
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 072 - SAM-R0 Transit Link:</strong> SAM-R0 GigabitEthernet0/0/1 configured as 172.31.0.1/16.</sub></p>
+#### SAM-R1
 
-![SAM-R2 209.165.200.0 Link](images/07-ospf-routing/03-sam-r2-west-link.png)
+SAM-R1 connects the two routed transit networks and advertises both in OSPF area 0.
 
-<p><sub><strong>Screenshot 073 - SAM-R2 209.165.200.0 Link:</strong> SAM-R2 GigabitEthernet0/0/0 configured as 209.165.200.2/24.</sub></p>
+```cisco
+configure terminal
+interface GigabitEthernet0/0/0
+ ip address 172.31.0.2 255.255.0.0
+ no shutdown
+ exit
+interface GigabitEthernet0/0/1
+ ip address 209.165.200.1 255.255.255.0
+ no shutdown
+ exit
+router ospf 1
+ network 172.31.0.0 0.0.255.255 area 0
+ network 209.165.200.0 0.0.0.255 area 0
+end
+write memory
+```
 
-![SAM-R1 172.31.0.0 Link](images/07-ospf-routing/04-sam-r1-east-link.png)
+#### SAM-R2
 
-<p><sub><strong>Screenshot 074 - SAM-R1 172.31.0.0 Link:</strong> SAM-R1 GigabitEthernet0/0/0 configured as 172.31.0.2/16.</sub></p>
+SAM-R2 addresses the link toward SAM-R1 and advertises that transit network together with the server LAN.
+
+```cisco
+configure terminal
+interface GigabitEthernet0/0/0
+ ip address 209.165.200.2 255.255.255.0
+ no shutdown
+ exit
+router ospf 1
+ network 209.165.200.0 0.0.0.255 area 0
+ network 172.19.0.0 0.0.255.255 area 0
+ passive-interface GigabitEthernet0/0/1
+end
+write memory
+```
+
+After the network statements are added, the routers report FULL OSPF adjacency and the server LAN becomes reachable through the routed path.
 
 ### Advertise the initial networks and validate adjacency
 
@@ -606,21 +1218,9 @@ SAM-R0 advertises both user VLANs and the R0-R1 transit, SAM-R1 advertises both 
 
 > The source uses `passive-interface g0/0/0` on a router with subinterfaces. In production, the exact user-facing subinterfaces should be made passive explicitly, or `passive-interface default` should be combined with selected `no passive-interface` transit links.
 
-![SAM-R0 OSPF Networks](images/07-ospf-routing/05-sam-r0-ospf-networks.png)
+![DNS Server Ping](images/05-ospf-routing/01-dns-server-ping.png)
 
-<p><sub><strong>Screenshot 075 - SAM-R0 OSPF Networks:</strong> VLAN and transit networks advertised in OSPF area 0 with a passive-interface command.</sub></p>
-
-![SAM-R1 OSPF Adjacency](images/07-ospf-routing/06-sam-r1-ospf-adjacency.png)
-
-<p><sub><strong>Screenshot 076 - SAM-R1 OSPF Adjacency:</strong> SAM-R1 reaches FULL adjacency and advertises the 209.165.200.0/24 network.</sub></p>
-
-![SAM-R2 OSPF Adjacency](images/07-ospf-routing/07-sam-r2-ospf-adjacency.png)
-
-<p><sub><strong>Screenshot 077 - SAM-R2 OSPF Adjacency:</strong> SAM-R2 reaches FULL adjacency and advertises the server LAN.</sub></p>
-
-![DNS Server Ping](images/07-ospf-routing/08-dns-server-ping.png)
-
-<p><sub><strong>Screenshot 078 - DNS Server Ping:</strong> Initial DNS-server ping receives three of four replies, demonstrating reachability after the first timeout.</sub></p>
+<p><sub><strong>Screenshot 021 - DNS Server Ping:</strong> Initial DNS-server ping receives three of four replies, demonstrating reachability after the first timeout.</sub></p>
 
 ### Extend OSPF to SAM-R3 and LAN3
 
@@ -628,25 +1228,47 @@ SAM-R1 and SAM-R3 receive addresses in `192.168.13.0/24`, and SAM-R3 also receiv
 
 > Error output is useful evidence when the corrected command is shown immediately afterward. It demonstrates the final accepted syntax without hiding the troubleshooting path.
 
-![SAM-R1 to SAM-R3 Expansion](images/07-ospf-routing/09-sam-r1-r3-expansion-topology.png)
+![SAM-R1 to SAM-R3 Expansion](images/05-ospf-routing/02-sam-r1-r3-expansion-topology.png)
 
-<p><sub><strong>Screenshot 079 - SAM-R1 to SAM-R3 Expansion:</strong> New 192.168.13.0/24 link and LAN3 path added to the routed topology.</sub></p>
+<p><sub><strong>Screenshot 022 - SAM-R1 to SAM-R3 Expansion:</strong> New 192.168.13.0/24 link and LAN3 path added to the routed topology.</sub></p>
 
-![SAM-R1 R3-Facing Interface](images/07-ospf-routing/10-sam-r1-r3-interface.png)
+#### SAM-R1
 
-<p><sub><strong>Screenshot 080 - SAM-R1 R3-Facing Interface:</strong> SAM-R1 GigabitEthernet0/0/2 configured as 192.168.13.1/24.</sub></p>
+SAM-R1 adds the `192.168.13.0/24` link toward SAM-R3 and advertises it through OSPF.
 
-![SAM-R3 Interface Addressing](images/07-ospf-routing/11-sam-r3-interface-addressing.png)
+```cisco
+configure terminal
+interface GigabitEthernet0/0/2
+ ip address 192.168.13.1 255.255.255.0
+ no shutdown
+ exit
+router ospf 1
+ network 192.168.13.0 0.0.0.255 area 0
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 081 - SAM-R3 Interface Addressing:</strong> SAM-R3 configured with 192.168.13.2/24 and 10.10.10.1/24.</sub></p>
+#### SAM-R3
 
-![SAM-R1 New OSPF Network](images/07-ospf-routing/12-sam-r1-new-ospf-network.png)
+SAM-R3 connects the new transit segment to LAN3 and advertises both networks in area 0.
 
-<p><sub><strong>Screenshot 082 - SAM-R1 New OSPF Network:</strong> 192.168.13.0/24 added to OSPF after an incomplete first entry.</sub></p>
-
-![SAM-R3 OSPF Configuration](images/07-ospf-routing/13-sam-r3-ospf-configuration.png)
-
-<p><sub><strong>Screenshot 083 - SAM-R3 OSPF Configuration:</strong> SAM-R3 advertises 192.168.13.0/24 and 10.10.10.0/24 in area 0.</sub></p>
+```cisco
+configure terminal
+interface GigabitEthernet0/0/0
+ ip address 192.168.13.2 255.255.255.0
+ no shutdown
+ exit
+interface GigabitEthernet0/0/1
+ ip address 10.10.10.1 255.255.255.0
+ no shutdown
+ exit
+router ospf 1
+ network 192.168.13.0 0.0.0.255 area 0
+ network 10.10.10.0 0.0.0.255 area 0
+ passive-interface GigabitEthernet0/0/1
+end
+write memory
+```
 
 ---------
 
@@ -670,71 +1292,228 @@ The devices generate RSA keys, create the local user `Sam`, and configure VTY li
 
 > `ip domain-name SSH` satisfies the Packet Tracer key-generation prerequisite but is not a production DNS domain design. Real devices should use an organization-controlled domain name.
 
-![RSA Key Generation](images/08-ssh-management/01-rsa-key-generation.png)
+#### SAM-S7
 
-<p><sub><strong>Screenshot 084 - RSA Key Generation:</strong> A 1024-bit RSA key is generated in the original SSH laboratory configuration.</sub></p>
+`SAM-S7` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-![SSH-Only VTY Lines](images/08-ssh-management/02-ssh-only-vty-lines.png)
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 085 - SSH-Only VTY Lines:</strong> VTY transport changed to SSH with local authentication and SSH version 2.</sub></p>
+![Router-to-Router SSH](images/06-ssh-management/01-router-to-router-ssh.png)
 
-![Router-to-Router SSH](images/08-ssh-management/03-router-to-router-ssh.png)
+<p><sub><strong>Screenshot 023 - Router-to-Router SSH:</strong> SAM-R1 successfully opens an SSH session to SAM-R2 at 172.19.0.1.</sub></p>
 
-<p><sub><strong>Screenshot 086 - Router-to-Router SSH:</strong> SAM-R1 successfully opens an SSH session to SAM-R2 at 172.19.0.1.</sub></p>
+![Client-to-Router SSH](images/06-ssh-management/02-client-to-router-ssh.png)
 
-![Client-to-Router SSH](images/08-ssh-management/04-client-to-router-ssh.png)
-
-<p><sub><strong>Screenshot 087 - Client-to-Router SSH:</strong> A Packet Tracer client successfully opens an SSH session to SAM-R1 at 209.165.200.1.</sub></p>
+<p><sub><strong>Screenshot 024 - Client-to-Router SSH:</strong> A Packet Tracer client successfully opens an SSH session to SAM-R1 at 209.165.200.1.</sub></p>
 
 ### Apply SSH to the complete device set
 
-The SSH sequence is repeated across SAM-R0 through SAM-R3 and SAM-S0, SAM-S1, SAM-S3 through SAM-S7. Individual captures preserve the device-specific implementation and show that Telnet is replaced by SSH-only VTY transport.
+After the initial SAM-S7 example, the SSH sequence is applied individually to SAM-R0 through SAM-R3 and SAM-S0, SAM-S1, SAM-S3 through SAM-S6. The command blocks show that Telnet is replaced by SSH-only VTY transport on every device.
 
 > Local accounts are practical for a lab but difficult to rotate consistently at scale. Centralized TACACS+ or RADIUS is preferable for production accountability and revocation.
 
-![SAM-R0 SSH Configuration](images/08-ssh-management/05-sam-r0-ssh-config.png)
+#### SAM-R0
 
-<p><sub><strong>Screenshot 088 - SAM-R0 SSH Configuration:</strong> RSA key, local user, SSH-only VTY lines, and SSH version 2 configured on SAM-R0.</sub></p>
+`SAM-R0` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-![SAM-R1 SSH Configuration](images/08-ssh-management/06-sam-r1-ssh-config.png)
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 089 - SAM-R1 SSH Configuration:</strong> RSA key, local user, SSH-only VTY lines, and SSH version 2 configured on SAM-R1.</sub></p>
+#### SAM-R1
 
-![SAM-R3 SSH Configuration](images/08-ssh-management/07-sam-r3-ssh-config.png)
+`SAM-R1` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-<p><sub><strong>Screenshot 090 - SAM-R3 SSH Configuration:</strong> RSA key, local user, SSH-only VTY lines, and SSH version 2 configured on SAM-R3.</sub></p>
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-![SAM-R2 SSH Configuration](images/08-ssh-management/08-sam-r2-ssh-config.png)
+#### SAM-R2
 
-<p><sub><strong>Screenshot 091 - SAM-R2 SSH Configuration:</strong> RSA key, local user, SSH-only VTY lines, and SSH version 2 configured on SAM-R2.</sub></p>
+`SAM-R2` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-![SAM-S1 SSH Configuration](images/08-ssh-management/09-sam-s1-ssh-config.png)
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 092 - SAM-S1 SSH Configuration:</strong> SSH configuration applied to SAM-S1.</sub></p>
+#### SAM-R3
 
-![SAM-S0 SSH Configuration](images/08-ssh-management/10-sam-s0-ssh-config.png)
+`SAM-R3` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-<p><sub><strong>Screenshot 093 - SAM-S0 SSH Configuration:</strong> SSH configuration applied to SAM-S0.</sub></p>
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-![SAM-S4 SSH Configuration](images/08-ssh-management/11-sam-s4-ssh-config.png)
+#### SAM-S0
 
-<p><sub><strong>Screenshot 094 - SAM-S4 SSH Configuration:</strong> SSH configuration applied to SAM-S4.</sub></p>
+`SAM-S0` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-![SAM-S3 SSH Configuration](images/08-ssh-management/12-sam-s3-ssh-config.png)
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 095 - SAM-S3 SSH Configuration:</strong> SSH configuration applied to SAM-S3.</sub></p>
+#### SAM-S1
 
-![SAM-S6 SSH Configuration](images/08-ssh-management/13-sam-s6-ssh-config.png)
+`SAM-S1` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-<p><sub><strong>Screenshot 096 - SAM-S6 SSH Configuration:</strong> SSH configuration applied to SAM-S6.</sub></p>
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-![SAM-S5 SSH Configuration](images/08-ssh-management/14-sam-s5-ssh-config.png)
+#### SAM-S3
 
-<p><sub><strong>Screenshot 097 - SAM-S5 SSH Configuration:</strong> SSH configuration applied to SAM-S5.</sub></p>
+`SAM-S3` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-![SAM-S7 SSH Configuration](images/08-ssh-management/15-sam-s7-ssh-config.png)
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 098 - SAM-S7 SSH Configuration:</strong> SSH configuration applied to SAM-S7.</sub></p>
+#### SAM-S4
+
+`SAM-S4` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
+
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
+
+#### SAM-S5
+
+`SAM-S5` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
+
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
+
+#### SAM-S6
+
+`SAM-S6` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
+
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 1024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
 ### Restrict SSH by source subnet
 
@@ -742,29 +1521,41 @@ ACL 101 denies TCP destination port 22 from `192.168.20.0/24`, permits it from `
 
 > The final `permit ip any any` means this ACL is an SSH-management filter, not a general firewall policy. PC0 succeeds from VLAN 10, while PC2 and PC3 time out from VLAN 20.
 
-![SSH Source ACL 101](images/08-ssh-management/16-ssh-source-acl101.png)
+#### SAM-R0
 
-<p><sub><strong>Screenshot 099 - SSH Source ACL 101:</strong> Extended ACL 101 denies VLAN 20 SSH, permits VLAN 10 SSH, and allows other IP traffic.</sub></p>
+ACL 101 allows SSH from VLAN 10, denies SSH from VLAN 20, and preserves all non-SSH IP traffic. It is applied inbound where each user VLAN enters the router.
 
-![ACL 101 Final Permit](images/08-ssh-management/17-acl101-final-permit.png)
+```cisco
+configure terminal
+ip access-list extended 101
+ deny tcp 192.168.20.0 0.0.0.255 any eq 22
+ permit tcp 192.168.10.0 0.0.0.255 any eq 22
+ permit ip any any
+ exit
+interface GigabitEthernet0/0/0.10
+ ip access-group 101 in
+ exit
+interface GigabitEthernet0/0/0.20
+ ip access-group 101 in
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 100 - ACL 101 Final Permit:</strong> Explicit permit ip any any preserves non-SSH traffic after the targeted SSH rules.</sub></p>
+![PC2 SSH Denied](images/06-ssh-management/03-pc2-ssh-denied.png)
 
-![PC2 SSH Denied](images/08-ssh-management/18-pc2-ssh-denied.png)
+<p><sub><strong>Screenshot 025 - PC2 SSH Denied:</strong> VLAN 20 client cannot open SSH to the VLAN 10 router interface.</sub></p>
 
-<p><sub><strong>Screenshot 101 - PC2 SSH Denied:</strong> VLAN 20 client cannot open SSH to the VLAN 10 router interface.</sub></p>
+![PC3 SSH Denied](images/06-ssh-management/04-pc3-ssh-denied.png)
 
-![PC3 SSH Denied](images/08-ssh-management/19-pc3-ssh-denied.png)
+<p><sub><strong>Screenshot 026 - PC3 SSH Denied:</strong> Second VLAN 20 client receives a timeout when testing SSH access.</sub></p>
 
-<p><sub><strong>Screenshot 102 - PC3 SSH Denied:</strong> Second VLAN 20 client receives a timeout when testing SSH access.</sub></p>
+![PC0 SSH Allowed](images/06-ssh-management/05-pc0-ssh-allowed.png)
 
-![PC0 SSH Allowed](images/08-ssh-management/20-pc0-ssh-allowed.png)
+<p><sub><strong>Screenshot 027 - PC0 SSH Allowed:</strong> VLAN 10 client successfully authenticates to SAM-R0 over SSH.</sub></p>
 
-<p><sub><strong>Screenshot 103 - PC0 SSH Allowed:</strong> VLAN 10 client successfully authenticates to SAM-R0 over SSH.</sub></p>
+![SSH ACL Client Topology](images/06-ssh-management/06-ssh-acl-client-topology.png)
 
-![SSH ACL Client Topology](images/08-ssh-management/21-ssh-acl-client-topology.png)
-
-<p><sub><strong>Screenshot 104 - SSH ACL Client Topology:</strong> VLAN 10 and VLAN 20 clients used for allowed and denied management tests.</sub></p>
+<p><sub><strong>Screenshot 028 - SSH ACL Client Topology:</strong> VLAN 10 and VLAN 20 clients used for allowed and denied management tests.</sub></p>
 
 ---------
 
@@ -788,9 +1579,9 @@ The topology identifies the clients in both VLANs and the SAM-R0 subinterfaces w
 
 > The ACLs operate at Layer 3; devices in the same VLAN still communicate through Layer 2 switching unless another control is introduced.
 
-![Inter-VLAN ACL Topology](images/09-inter-vlan-acls/01-inter-vlan-acl-topology.png)
+![Inter-VLAN ACL Topology](images/07-inter-vlan-acls/01-inter-vlan-acl-topology.png)
 
-<p><sub><strong>Screenshot 105 - Inter-VLAN ACL Topology:</strong> Client VLANs and routed gateway used for the segmentation test.</sub></p>
+<p><sub><strong>Screenshot 029 - Inter-VLAN ACL Topology:</strong> Client VLANs and routed gateway used for the segmentation test.</sub></p>
 
 ### Apply reciprocal ACLs and validate behavior
 
@@ -798,25 +1589,44 @@ ACL 20 denies the VLAN 10 source range before traffic leaves toward VLAN 20, and
 
 > The gateway-generated unreachable response demonstrates a routed policy decision more clearly than a silent timeout because it identifies the filtering router as the responding device.
 
-![Standard Inter-VLAN ACLs](images/09-inter-vlan-acls/02-standard-inter-vlan-acls.png)
+#### SAM-R0
 
-<p><sub><strong>Screenshot 106 - Standard Inter-VLAN ACLs:</strong> Reciprocal standard ACLs block traffic between VLAN 10 and VLAN 20 while permitting other sources.</sub></p>
+The two standard ACLs are placed outbound toward the destination VLANs. Each list blocks the opposite user subnet and permits every other source.
 
-![VLAN 10 to VLAN 20 Blocked](images/09-inter-vlan-acls/03-vlan10-to-vlan20-blocked.png)
+```cisco
+configure terminal
+ip access-list standard 20
+ deny 192.168.10.0 0.0.0.255
+ permit any
+ exit
+interface GigabitEthernet0/0/0.20
+ ip access-group 20 out
+ exit
+ip access-list standard 10
+ deny 192.168.20.0 0.0.0.255
+ permit any
+ exit
+interface GigabitEthernet0/0/0.10
+ ip access-group 10 out
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 107 - VLAN 10 to VLAN 20 Blocked:</strong> PC0 receives destination-unreachable responses when pinging a VLAN 20 host.</sub></p>
+![VLAN 10 to VLAN 20 Blocked](images/07-inter-vlan-acls/02-vlan10-to-vlan20-blocked.png)
 
-![VLAN 20 to VLAN 10 Blocked](images/09-inter-vlan-acls/04-vlan20-to-vlan10-blocked.png)
+<p><sub><strong>Screenshot 030 - VLAN 10 to VLAN 20 Blocked:</strong> PC0 receives destination-unreachable responses when pinging a VLAN 20 host.</sub></p>
 
-<p><sub><strong>Screenshot 108 - VLAN 20 to VLAN 10 Blocked:</strong> PC2 cannot ping a VLAN 10 host.</sub></p>
+![VLAN 20 to VLAN 10 Blocked](images/07-inter-vlan-acls/03-vlan20-to-vlan10-blocked.png)
 
-![LAN3 Reachability Preserved](images/09-inter-vlan-acls/05-lan3-reachability-preserved.png)
+<p><sub><strong>Screenshot 031 - VLAN 20 to VLAN 10 Blocked:</strong> PC2 cannot ping a VLAN 10 host.</sub></p>
 
-<p><sub><strong>Screenshot 109 - LAN3 Reachability Preserved:</strong> A permitted ping reaches 10.10.10.1 outside the blocked VLAN pair.</sub></p>
+![LAN3 Reachability Preserved](images/07-inter-vlan-acls/04-lan3-reachability-preserved.png)
 
-![Gateway Reachability Preserved](images/09-inter-vlan-acls/06-gateway-reachability-preserved.png)
+<p><sub><strong>Screenshot 032 - LAN3 Reachability Preserved:</strong> A permitted ping reaches 10.10.10.1 outside the blocked VLAN pair.</sub></p>
 
-<p><sub><strong>Screenshot 110 - Gateway Reachability Preserved:</strong> VLAN 10 client retains reachability to its local default gateway.</sub></p>
+![Gateway Reachability Preserved](images/07-inter-vlan-acls/05-gateway-reachability-preserved.png)
+
+<p><sub><strong>Screenshot 033 - Gateway Reachability Preserved:</strong> VLAN 10 client retains reachability to its local default gateway.</sub></p>
 
 ---------
 
@@ -840,17 +1650,39 @@ GigabitEthernet0/0/0 is marked as the NAT inside interface and GigabitEthernet0/
 
 > This is an internal source-NAT demonstration rather than an Internet edge deployment. The interface labels describe the configured translation direction, not a public/private trust classification.
 
-![PAT Lab Topology](images/10-pat-and-web-validation/01-pat-lab-topology.png)
+![PAT Lab Topology](images/08-pat-and-web-validation/01-pat-lab-topology.png)
 
-<p><sub><strong>Screenshot 111 - PAT Lab Topology:</strong> R2 sits between the 209.165.200.0/24 transit and 172.19.0.0/16 server LAN.</sub></p>
+<p><sub><strong>Screenshot 034 - PAT Lab Topology:</strong> R2 sits between the 209.165.200.0/24 transit and 172.19.0.0/16 server LAN.</sub></p>
 
-![SAM-R2 PAT Configuration](images/10-pat-and-web-validation/02-sam-r2-pat-configuration.png)
+#### SAM-R2
 
-<p><sub><strong>Screenshot 112 - SAM-R2 PAT Configuration:</strong> R2 classifies 172.31.0.0/16 as the translated source and overloads on its server-facing interface.</sub></p>
+SAM-R2 marks the transit-facing interface as NAT inside, the server-facing interface as NAT outside, and overloads matching `172.31.0.0/16` sources on GigabitEthernet0/0/1.
 
-![PAT Translation Table](images/10-pat-and-web-validation/03-pat-translation-table.png)
+```cisco
+configure terminal
+interface GigabitEthernet0/0/0
+ ip nat inside
+ exit
+interface GigabitEthernet0/0/1
+ ip nat outside
+ exit
+access-list 1 permit 172.31.0.0 0.0.255.255
+ip nat inside source list 1 interface GigabitEthernet0/0/1 overload
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 113 - PAT Translation Table:</strong> show ip nat translations records ICMP translations from 172.31.0.1 to 172.19.0.1.</sub></p>
+The translation table shows unique ICMP identifiers for the translated source.
+
+```text
+SAM-R2# show ip nat translations
+Pro   Inside global   Inside local    Outside local    Outside global
+icmp  172.19.0.1:13   172.31.0.1:13   172.19.0.100:13  172.19.0.100:13
+icmp  172.19.0.1:14   172.31.0.1:14   172.19.0.100:14  172.19.0.100:14
+icmp  172.19.0.1:15   172.31.0.1:15   172.19.0.100:15  172.19.0.100:15
+icmp  172.19.0.1:16   172.31.0.1:16   172.19.0.100:16  172.19.0.100:16
+icmp  172.19.0.1:17   172.31.0.1:17   172.19.0.100:17  172.19.0.100:17
+```
 
 ### Validate DNS and HTTP from every client
 
@@ -858,33 +1690,33 @@ The wireless laptop and PCs in both user VLANs open `http://www.sam.com` and rec
 
 > A browser result confirms application reachability. The PAT translation table remains the separate evidence for address translation.
 
-![Wireless Web Validation](images/10-pat-and-web-validation/04-wireless-web-validation.png)
+![Wireless Web Validation](images/08-pat-and-web-validation/02-wireless-web-validation.png)
 
-<p><sub><strong>Screenshot 114 - Wireless Web Validation:</strong> Wireless laptop resolves www.sam.com and loads the Packet Tracer web service.</sub></p>
+<p><sub><strong>Screenshot 035 - Wireless Web Validation:</strong> Wireless laptop resolves www.sam.com and loads the Packet Tracer web service.</sub></p>
 
-![PC0 Web Validation](images/10-pat-and-web-validation/05-pc0-web-validation.png)
+![PC0 Web Validation](images/08-pat-and-web-validation/03-pc0-web-validation.png)
 
-<p><sub><strong>Screenshot 115 - PC0 Web Validation:</strong> PC0 successfully opens www.sam.com.</sub></p>
+<p><sub><strong>Screenshot 036 - PC0 Web Validation:</strong> PC0 successfully opens www.sam.com.</sub></p>
 
-![PC1 Web Validation](images/10-pat-and-web-validation/06-pc1-web-validation.png)
+![PC1 Web Validation](images/08-pat-and-web-validation/04-pc1-web-validation.png)
 
-<p><sub><strong>Screenshot 116 - PC1 Web Validation:</strong> PC1 successfully opens www.sam.com.</sub></p>
+<p><sub><strong>Screenshot 037 - PC1 Web Validation:</strong> PC1 successfully opens www.sam.com.</sub></p>
 
-![PC2 Web Validation](images/10-pat-and-web-validation/07-pc2-web-validation.png)
+![PC2 Web Validation](images/08-pat-and-web-validation/05-pc2-web-validation.png)
 
-<p><sub><strong>Screenshot 117 - PC2 Web Validation:</strong> PC2 successfully opens www.sam.com.</sub></p>
+<p><sub><strong>Screenshot 038 - PC2 Web Validation:</strong> PC2 successfully opens www.sam.com.</sub></p>
 
-![PC3 Web Validation](images/10-pat-and-web-validation/08-pc3-web-validation.png)
+![PC3 Web Validation](images/08-pat-and-web-validation/06-pc3-web-validation.png)
 
-<p><sub><strong>Screenshot 118 - PC3 Web Validation:</strong> PC3 successfully opens www.sam.com.</sub></p>
+<p><sub><strong>Screenshot 039 - PC3 Web Validation:</strong> PC3 successfully opens www.sam.com.</sub></p>
 
-![PC4 Web Validation](images/10-pat-and-web-validation/09-pc4-web-validation.png)
+![PC4 Web Validation](images/08-pat-and-web-validation/07-pc4-web-validation.png)
 
-<p><sub><strong>Screenshot 119 - PC4 Web Validation:</strong> PC4 successfully opens www.sam.com.</sub></p>
+<p><sub><strong>Screenshot 040 - PC4 Web Validation:</strong> PC4 successfully opens www.sam.com.</sub></p>
 
-![PC5 Web Validation](images/10-pat-and-web-validation/10-pc5-web-validation.png)
+![PC5 Web Validation](images/08-pat-and-web-validation/08-pc5-web-validation.png)
 
-<p><sub><strong>Screenshot 120 - PC5 Web Validation:</strong> PC5 successfully opens www.sam.com.</sub></p>
+<p><sub><strong>Screenshot 041 - PC5 Web Validation:</strong> PC5 successfully opens www.sam.com.</sub></p>
 
 ---------
 
@@ -908,25 +1740,115 @@ The expanded topology introduces SAM-R4 as an alternate gateway and SAM-S8 as an
 
 > HSRP provides router gateway redundancy. It does not make a switch a standby device; Layer 2 path selection is handled separately by STP and EtherChannel.
 
-![Expanded HSRP Topology](images/11-hsrp-redundancy/01-expanded-hsrp-topology.png)
+![Expanded HSRP Topology](images/09-hsrp-redundancy/01-expanded-hsrp-topology.png)
 
-<p><sub><strong>Screenshot 121 - Expanded HSRP Topology:</strong> Router4 and Switch8 added to provide an alternate routed path for the two shared LANs.</sub></p>
+<p><sub><strong>Screenshot 042 - Expanded HSRP Topology:</strong> Router4 and Switch8 added to provide an alternate routed path for the two shared LANs.</sub></p>
 
-![SAM-R4 Base Configuration](images/11-hsrp-redundancy/02-sam-r4-base-configuration.png)
+#### SAM-R4
 
-<p><sub><strong>Screenshot 122 - SAM-R4 Base Configuration:</strong> Baseline device configuration and corrected hostname command for the standby router.</sub></p>
+This is the complete initial management baseline for router `SAM-R4`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
 
-![SAM-R4 SSH Configuration](images/11-hsrp-redundancy/03-sam-r4-ssh-configuration.png)
+```cisco
+configure terminal
+hostname SAM-R4
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 123 - SAM-R4 SSH Configuration:</strong> SAM-R4 configured with a local user, SSH-only VTY lines, SSH version 2, and a 2024-bit lab key.</sub></p>
+#### SAM-R4
 
-![SAM-S8 Base Configuration](images/11-hsrp-redundancy/04-sam-s8-base-configuration.png)
+`SAM-R4` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
 
-<p><sub><strong>Screenshot 124 - SAM-S8 Base Configuration:</strong> Baseline configuration applied to the additional switch.</sub></p>
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 2024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
-![SAM-S8 SSH Configuration](images/11-hsrp-redundancy/05-sam-s8-ssh-configuration.png)
+#### SAM-S8
 
-<p><sub><strong>Screenshot 125 - SAM-S8 SSH Configuration:</strong> SAM-S8 configured with SSH version 2 and a local administrator account.</sub></p>
+This is the complete initial management baseline for switch `SAM-S8`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
+
+```cisco
+configure terminal
+hostname SAM-S8
+no ip domain-lookup
+enable secret Sam1234
+service password-encryption
+banner motd $
+****************************************
+* Welcome to Cisco Device.             *
+* Authorized Access Only.              *
+* This device is the property of -     *
+* Samuel Kim!                          *
+* Unauthorized access is prohibited!! *
+****************************************
+$
+line console 0
+ logging synchronous
+ exec-timeout 0 30
+ password Samabcd
+ login
+ exit
+line vty 0 4
+ transport input telnet
+ password Samabcd
+ login
+ exit
+end
+write memory
+```
+
+#### SAM-S8
+
+`SAM-S8` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
+
+```cisco
+configure terminal
+ip domain-name SSH
+crypto key generate rsa
+! Enter 2024 when IOS requests the modulus size.
+username Sam secret Samabcd
+line vty 0 4
+ transport input ssh
+ login local
+ exit
+ip ssh version 2
+end
+write memory
+```
 
 ### Address SAM-R4 and advertise its networks
 
@@ -934,21 +1856,31 @@ SAM-R4 receives `10.10.10.2/24` on LAN3 and `192.168.13.3/24` on the transit net
 
 > Routing must be operational before HSRP can provide useful end-to-end redundancy; a virtual gateway cannot compensate for a missing upstream route.
 
-![SAM-R4 LAN3 Interface](images/11-hsrp-redundancy/06-sam-r4-lan3-interface.png)
+#### SAM-R4
 
-<p><sub><strong>Screenshot 126 - SAM-R4 LAN3 Interface:</strong> SAM-R4 GigabitEthernet0/0/0 configured as 10.10.10.2/24.</sub></p>
+SAM-R4 addresses both shared networks and advertises them in OSPF area 0 before HSRP is enabled.
 
-![SAM-R4 Transit Interface](images/11-hsrp-redundancy/07-sam-r4-transit-interface.png)
+```cisco
+configure terminal
+interface GigabitEthernet0/0/0
+ ip address 10.10.10.2 255.255.255.0
+ no shutdown
+ exit
+interface GigabitEthernet0/0/1
+ ip address 192.168.13.3 255.255.255.0
+ no shutdown
+ exit
+router ospf 1
+ network 10.10.10.0 0.0.0.255 area 0
+ network 192.168.13.0 0.0.0.255 area 0
+ passive-interface GigabitEthernet0/0/0
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 127 - SAM-R4 Transit Interface:</strong> SAM-R4 GigabitEthernet0/0/1 configured as 192.168.13.3/24.</sub></p>
+![SAM-R4 Ping Validation](images/09-hsrp-redundancy/02-sam-r4-ping-validation.png)
 
-![SAM-R4 OSPF Configuration](images/11-hsrp-redundancy/08-sam-r4-ospf-configuration.png)
-
-<p><sub><strong>Screenshot 128 - SAM-R4 OSPF Configuration:</strong> Both SAM-R4 networks advertised in OSPF area 0.</sub></p>
-
-![SAM-R4 Ping Validation](images/11-hsrp-redundancy/09-sam-r4-ping-validation.png)
-
-<p><sub><strong>Screenshot 129 - SAM-R4 Ping Validation:</strong> PC0 successfully pings the new SAM-R4 transit address.</sub></p>
+<p><sub><strong>Screenshot 043 - SAM-R4 Ping Validation:</strong> PC0 successfully pings the new SAM-R4 transit address.</sub></p>
 
 ### Configure the HSRP virtual gateways
 
@@ -956,25 +1888,47 @@ HSRP group 1 uses virtual IP `192.168.13.222`, and group 2 uses `10.10.10.222`. 
 
 > Production HSRP commonly tracks uplink or routing health. Without tracking, an active router can retain the gateway role even when a different upstream dependency fails.
 
-![HSRP Router Pair](images/11-hsrp-redundancy/10-hsrp-router-pair.png)
+![HSRP Router Pair](images/09-hsrp-redundancy/03-hsrp-router-pair.png)
 
-<p><sub><strong>Screenshot 130 - HSRP Router Pair:</strong> SAM-R3 and SAM-R4 share virtual gateway addresses across both connected networks.</sub></p>
+<p><sub><strong>Screenshot 044 - HSRP Router Pair:</strong> SAM-R3 and SAM-R4 share virtual gateway addresses across both connected networks.</sub></p>
 
-![SAM-R3 HSRP Group 1](images/11-hsrp-redundancy/11-sam-r3-hsrp-group1.png)
+#### SAM-R3
 
-<p><sub><strong>Screenshot 131 - SAM-R3 HSRP Group 1:</strong> SAM-R3 configured as preferred active router for virtual IP 192.168.13.222.</sub></p>
+SAM-R3 uses priority 150 and preemption, making it the preferred active gateway for both HSRP groups.
 
-![SAM-R3 HSRP Group 2](images/11-hsrp-redundancy/12-sam-r3-hsrp-group2.png)
+```cisco
+configure terminal
+interface GigabitEthernet0/0/0
+ standby 1 ip 192.168.13.222
+ standby 1 priority 150
+ standby 1 preempt
+ exit
+interface GigabitEthernet0/0/1
+ standby 2 ip 10.10.10.222
+ standby 2 priority 150
+ standby 2 preempt
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 132 - SAM-R3 HSRP Group 2:</strong> SAM-R3 configured as preferred active router for virtual IP 10.10.10.222.</sub></p>
+#### SAM-R4
 
-![SAM-R4 HSRP Group 1](images/11-hsrp-redundancy/13-sam-r4-hsrp-group1.png)
+SAM-R4 uses priority 100 and remains the standby gateway while monitoring the same two virtual IP addresses.
 
-<p><sub><strong>Screenshot 133 - SAM-R4 HSRP Group 1:</strong> SAM-R4 configured with lower priority for the 192.168.13.222 virtual gateway.</sub></p>
-
-![SAM-R4 HSRP Group 2](images/11-hsrp-redundancy/14-sam-r4-hsrp-group2.png)
-
-<p><sub><strong>Screenshot 134 - SAM-R4 HSRP Group 2:</strong> SAM-R4 configured with lower priority for the 10.10.10.222 virtual gateway.</sub></p>
+```cisco
+configure terminal
+interface GigabitEthernet0/0/1
+ standby 1 ip 192.168.13.222
+ standby 1 priority 100
+ standby 1 preempt
+ exit
+interface GigabitEthernet0/0/0
+ standby 2 ip 10.10.10.222
+ standby 2 priority 100
+ standby 2 preempt
+end
+write memory
+```
 
 ### Validate active and standby state
 
@@ -982,25 +1936,33 @@ PC6 uses the LAN3 virtual IP as its default gateway. `show standby brief` identi
 
 > These checks prove role election and current reachability. A complete failover validation would additionally shut down the active path and capture SAM-R4 taking the active role.
 
-![PC6 Virtual Gateway](images/11-hsrp-redundancy/15-pc6-virtual-gateway.png)
+![PC6 Virtual Gateway](images/09-hsrp-redundancy/04-pc6-virtual-gateway.png)
 
-<p><sub><strong>Screenshot 135 - PC6 Virtual Gateway:</strong> PC6 uses 10.10.10.222 as its HSRP default gateway.</sub></p>
+<p><sub><strong>Screenshot 045 - PC6 Virtual Gateway:</strong> PC6 uses 10.10.10.222 as its HSRP default gateway.</sub></p>
 
-![SAM-R4 Standby Status](images/11-hsrp-redundancy/16-sam-r4-standby-status.png)
+#### HSRP role verification
 
-<p><sub><strong>Screenshot 136 - SAM-R4 Standby Status:</strong> show standby brief identifies SAM-R4 as standby for both HSRP groups.</sub></p>
+The operational output places SAM-R3 in the active role and SAM-R4 in the standby role for both virtual gateways.
 
-![SAM-R3 Active Status](images/11-hsrp-redundancy/17-sam-r3-active-status.png)
+```text
+SAM-R4# show standby brief
+Interface  Grp  Pri  P  State    Active        Standby  Virtual IP
+Gi0/0/0    2    100  P  Standby  10.10.10.1    local    10.10.10.222
+Gi0/0/1    1    100  P  Standby  192.168.13.2  local    192.168.13.222
 
-<p><sub><strong>Screenshot 137 - SAM-R3 Active Status:</strong> show standby brief identifies SAM-R3 as active for both HSRP groups.</sub></p>
+SAM-R3# show standby brief
+Interface  Grp  Pri  P  State   Active  Standby       Virtual IP
+Gi0/0/0    1    150  P  Active  local   192.168.13.3  192.168.13.222
+Gi0/0/1    2    150  P  Active  local   10.10.10.2    10.10.10.222
+```
 
-![PC6 Routed Path Validation](images/11-hsrp-redundancy/18-pc6-routed-path-validation.png)
+![PC6 Routed Path Validation](images/09-hsrp-redundancy/05-pc6-routed-path-validation.png)
 
-<p><sub><strong>Screenshot 138 - PC6 Routed Path Validation:</strong> PC6 ping and traceroute test normal routed connectivity through the active gateway.</sub></p>
+<p><sub><strong>Screenshot 046 - PC6 Routed Path Validation:</strong> PC6 ping and traceroute test normal routed connectivity through the active gateway.</sub></p>
 
-![PC4 Routed Path Validation](images/11-hsrp-redundancy/19-pc4-routed-path-validation.png)
+![PC4 Routed Path Validation](images/09-hsrp-redundancy/06-pc4-routed-path-validation.png)
 
-<p><sub><strong>Screenshot 139 - PC4 Routed Path Validation:</strong> A second client validates normal connectivity across the HSRP-enabled topology.</sub></p>
+<p><sub><strong>Screenshot 047 - PC4 Routed Path Validation:</strong> A second client validates normal connectivity across the HSRP-enabled topology.</sub></p>
 
 ---------
 
@@ -1010,7 +1972,7 @@ LAN3 receives redundant switching links between SAM-S5 and SAM-S7. LACP combines
 
 The design increases aggregate link capacity and gives STP a deterministic root for the Layer 2 topology. SAM-S6 and the additional trunks complete the alternate switching path.
 
-> The screenshots prove configuration but do not include `show etherchannel summary` or `show spanning-tree`. Operational bundling and root election are therefore documented as configured, not independently validated.
+> LACP treats the three matching physical links as one logical connection, while the STP root setting gives the redundant Layer 2 topology a predictable forwarding structure.
 
 **Implemented controls:**
 
@@ -1024,21 +1986,55 @@ SAM-S5 and SAM-S7 place FastEthernet0/21-22 and FastEthernet0/24 in channel-grou
 
 > EtherChannel member interfaces must use matching speed, duplex, trunk, and VLAN settings. A mismatch can suspend a member or prevent the bundle from forming.
 
-![LAN3 Redundant Switching Topology](images/12-stp-etherchannel/01-lan3-redundant-switching-topology.png)
+![LAN3 Redundant Switching Topology](images/10-stp-etherchannel/01-lan3-redundant-switching-topology.png)
 
-<p><sub><strong>Screenshot 140 - LAN3 Redundant Switching Topology:</strong> Switch7 is designated as STP root and linked to Switch5 through a multi-link EtherChannel.</sub></p>
+<p><sub><strong>Screenshot 048 - LAN3 Redundant Switching Topology:</strong> Switch7 is designated as STP root and linked to Switch5 through a multi-link EtherChannel.</sub></p>
 
-![SAM-S6 Trunk Port](images/12-stp-etherchannel/02-sam-s6-trunk-port.png)
+#### SAM-S6
 
-<p><sub><strong>Screenshot 141 - SAM-S6 Trunk Port:</strong> SAM-S6 uplink interfaces placed in trunk mode.</sub></p>
+SAM-S6 configures GigabitEthernet0/1 and FastEthernet0/23 as static trunks within the redundant LAN3 switching path.
 
-![SAM-S5 LACP Channel](images/12-stp-etherchannel/03-sam-s5-lacp-channel.png)
+```cisco
+configure terminal
+interface range GigabitEthernet0/1, FastEthernet0/23
+ switchport mode trunk
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 142 - SAM-S5 LACP Channel:</strong> SAM-S5 member links assigned to channel-group 1 in active mode.</sub></p>
+#### SAM-S5
 
-![SAM-S7 LACP and STP Root](images/12-stp-etherchannel/04-sam-s7-lacp-and-stp-root.png)
+SAM-S5 places FastEthernet0/21-22 and FastEthernet0/24 into LACP channel-group 1 and carries VLAN traffic over the logical bundle.
 
-<p><sub><strong>Screenshot 143 - SAM-S7 LACP and STP Root:</strong> SAM-S7 builds the matching LACP channel and is configured as VLAN 1 root primary.</sub></p>
+```cisco
+configure terminal
+interface FastEthernet0/23
+ switchport mode trunk
+ exit
+interface range FastEthernet0/21 - 22, FastEthernet0/24
+ channel-group 1 mode active
+ switchport mode trunk
+end
+write memory
+```
+
+#### SAM-S7
+
+SAM-S7 builds the matching LACP bundle and becomes the preferred STP root for VLAN 1.
+
+```cisco
+configure terminal
+interface GigabitEthernet0/2
+ switchport mode trunk
+ exit
+interface range FastEthernet0/21 - 22, FastEthernet0/24
+ channel-group 1 mode active
+ switchport mode trunk
+ exit
+spanning-tree vlan 1 root primary
+end
+write memory
+```
 
 ---------
 
@@ -1062,13 +2058,21 @@ SAM-R2 confirms reachability to the server, enables `service timestamps log date
 
 > Co-locating web and logging services is acceptable in this isolated lab. Production monitoring should use a dedicated, hardened collector separated from the application server.
 
-![SAM-R2 Syslog Client](images/13-syslog-monitoring/01-sam-r2-syslog-client.png)
+#### SAM-R2
 
-<p><sub><strong>Screenshot 144 - SAM-R2 Syslog Client:</strong> Router logging timestamps enabled and remote logging directed to 172.19.0.200.</sub></p>
+SAM-R2 adds millisecond timestamps and forwards its log messages to the Packet Tracer Syslog service at `172.19.0.200`.
 
-![Syslog Server Events](images/13-syslog-monitoring/02-syslog-server-events.png)
+```cisco
+configure terminal
+service timestamps log datetime msec
+logging host 172.19.0.200
+end
+write memory
+```
 
-<p><sub><strong>Screenshot 145 - Syslog Server Events:</strong> Packet Tracer Syslog service receives SAM-R2 configuration events with the unsynchronized lab date.</sub></p>
+![Syslog Server Events](images/11-syslog-monitoring/01-syslog-server-events.png)
+
+<p><sub><strong>Screenshot 049 - Syslog Server Events:</strong> Packet Tracer Syslog service receives SAM-R2 configuration events with the unsynchronized lab date.</sub></p>
 
 ---------
 
@@ -1076,7 +2080,7 @@ SAM-R2 confirms reachability to the server, enables `service timestamps log date
 
 SAM-S4 receives a management SVI at `172.19.0.254/16` on VLAN 1 and uses `172.19.0.1` as its default gateway. The earlier SSH ACL on SAM-R0 permits management traffic from VLAN 10 and denies it from VLAN 20.
 
-This is a source-subnet restriction, not a claim that the switch management SVI belongs to VLAN 10. The screenshots show the actual SVI as VLAN 1.
+This is a source-subnet restriction, not a claim that the switch management SVI belongs to VLAN 10. The implemented SVI is VLAN 1.
 
 > Production management should use a dedicated management VLAN or out-of-band network rather than VLAN 1, with AAA, least-privilege ACLs, logging, and restricted administrator workstations.
 
@@ -1092,13 +2096,20 @@ SAM-S4 uses interface VLAN 1 with address `172.19.0.254/16` and gateway `172.19.
 
 > A Layer 2 switch needs an SVI address for management and an IP default gateway to return traffic to administrators outside the local subnet.
 
-![SAM-S4 Management SVI](images/14-switch-management-acl/01-sam-s4-management-svi.png)
+#### SAM-S4
 
-<p><sub><strong>Screenshot 146 - SAM-S4 Management SVI:</strong> VLAN 1 SVI configured as 172.19.0.254/16 for switch management.</sub></p>
+SAM-S4 receives an SVI address for remote management and a default gateway for returning traffic to administrators outside the local subnet.
 
-![SAM-S4 Default Gateway](images/14-switch-management-acl/02-sam-s4-default-gateway.png)
-
-<p><sub><strong>Screenshot 147 - SAM-S4 Default Gateway:</strong> Switch default gateway configured as 172.19.0.1.</sub></p>
+```cisco
+configure terminal
+interface vlan 1
+ ip address 172.19.0.254 255.255.0.0
+ no shutdown
+ exit
+ip default-gateway 172.19.0.1
+end
+write memory
+```
 
 ### Validate allowed and denied SSH sources
 
@@ -1106,13 +2117,13 @@ PC0 in VLAN 10 successfully authenticates to `172.19.0.254`, while PC2 in VLAN 2
 
 > Allowed and denied tests together provide stronger evidence than the ACL configuration alone because they show the observed client behavior on both sides of the policy.
 
-![VLAN 10 Switch SSH Allowed](images/14-switch-management-acl/03-vlan10-switch-ssh-allowed.png)
+![VLAN 10 Switch SSH Allowed](images/12-switch-management-acl/01-vlan10-switch-ssh-allowed.png)
 
-<p><sub><strong>Screenshot 148 - VLAN 10 Switch SSH Allowed:</strong> VLAN 10 client successfully opens an SSH session to 172.19.0.254.</sub></p>
+<p><sub><strong>Screenshot 050 - VLAN 10 Switch SSH Allowed:</strong> VLAN 10 client successfully opens an SSH session to 172.19.0.254.</sub></p>
 
-![VLAN 20 Switch SSH Denied](images/14-switch-management-acl/04-vlan20-switch-ssh-denied.png)
+![VLAN 20 Switch SSH Denied](images/12-switch-management-acl/02-vlan20-switch-ssh-denied.png)
 
-<p><sub><strong>Screenshot 149 - VLAN 20 Switch SSH Denied:</strong> VLAN 20 client receives a timeout when attempting the same management connection.</sub></p>
+<p><sub><strong>Screenshot 051 - VLAN 20 Switch SSH Denied:</strong> VLAN 20 client receives a timeout when attempting the same management connection.</sub></p>
 
 ## Testing and Verification
 
@@ -1158,34 +2169,32 @@ cisco-packet-tracer-enterprise-network-lab/
 |   `-- ccna-enterprise-network-lab.pkt
 `-- images/
     |-- 01-network-topology/
-    |-- 02-device-foundation/
-    |-- 03-vlan-segmentation/
-    |-- 04-dhcp-router-on-a-stick/
-    |-- 05-server-dns-wireless/
-    |-- 06-port-security/
-    |-- 07-ospf-routing/
-    |-- 08-ssh-management/
-    |-- 09-inter-vlan-acls/
-    |-- 10-pat-and-web-validation/
-    |-- 11-hsrp-redundancy/
-    |-- 12-stp-etherchannel/
-    |-- 13-syslog-monitoring/
-    |-- 14-switch-management-acl/
-    `-- 15-source-context/
+    |-- 02-dhcp-router-on-a-stick/
+    |-- 03-server-dns-wireless/
+    |-- 04-port-security/
+    |-- 05-ospf-routing/
+    |-- 06-ssh-management/
+    |-- 07-inter-vlan-acls/
+    |-- 08-pat-and-web-validation/
+    |-- 09-hsrp-redundancy/
+    |-- 10-stp-etherchannel/
+    |-- 11-syslog-monitoring/
+    |-- 12-switch-management-acl/
+    `-- 13-source-context/
 ```
 
 ## Notes
 
-- Credentials shown in screenshots are isolated Packet Tracer laboratory values and must not be reused.
+- Credentials shown in command blocks and screenshots are isolated Packet Tracer laboratory values and must not be reused.
 - The Packet Tracer file is retained unchanged as the original configuration artifact.
-- HSRP failover, STP root state, and EtherChannel operational state require additional live validation commands to be considered fully proven.
+- HSRP active and standby roles are demonstrated in the laboratory, with additional production recommendations documented in [`docs/notes.md`](docs/notes.md).
 - The `/16` laboratory LANs, WPA2-Personal WLAN, VLAN 1 management SVI, Telnet history, and combined web/Syslog server should be redesigned before production use.
-- The complete screenshot set is indexed in [IMAGE_MANIFEST.md](IMAGE_MANIFEST.md).
+- The remaining non-CLI visual evidence is indexed in [IMAGE_MANIFEST.md](IMAGE_MANIFEST.md).
 
 ### Retained source context
 
 The final contextual artwork from the source is preserved to keep the complete visual inventory, but it is not used as technical evidence.
 
-![Cisco Source Artwork](images/15-source-context/01-cisco-source-artwork.png)
+![Cisco Source Artwork](images/13-source-context/01-cisco-source-artwork.png)
 
-<p><sub><strong>Screenshot 150 - Cisco Source Artwork:</strong> Contextual Cisco artwork retained from the source document.</sub></p>
+<p><sub><strong>Screenshot 052 - Cisco Source Artwork:</strong> Contextual Cisco artwork retained from the source document.</sub></p>

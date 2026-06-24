@@ -4,24 +4,24 @@
 
 The README is based on the complete supplied PDF evidence. The original Packet Tracer `.pkt` file is included unchanged as a reusable lab artifact and was not independently inspected at the user's request.
 
-Configuration screens prove that settings were entered. Client results, protocol output, translation tables, and logs are treated as stronger evidence of observed behavior. No result is claimed beyond what the screenshots demonstrate.
+The README reproduces the demonstrated Cisco IOS settings as readable command blocks. Client results, protocol output, translation tables, and logs are retained as stronger evidence of observed behavior. No result is claimed beyond what the supplied project evidence demonstrates.
 
 ## Laboratory credentials
 
-The project intentionally retains the following isolated Packet Tracer values:
+The project intentionally displays and retains the following isolated Packet Tracer values so the laboratory configuration remains reproducible:
 
 - console and initial Telnet password: `Samabcd`;
 - enable secret: `Sam1234`;
 - SSH user: `Sam` with laboratory secret `Samabcd`;
 - wireless pre-shared key: `Abcd1234`.
 
-These values are public lab data and must never be reused on real devices.
+These values are deliberately open laboratory data, not exposed real-world credentials. They must never be reused on real devices.
 
 ## Telnet and stored passwords
 
-Telnet appears during the initial device configuration and is later replaced by SSH-only VTY access. Telnet provides no confidentiality and should not remain enabled in production.
+Telnet appears during the initial device configuration and is later replaced by SSH-only VTY access. Telnet provides no confidentiality and should not remain enabled in production. A production baseline should permit only SSH version 2 on VTY lines and restrict administrative access through ACLs and centralized AAA.
 
-`service password-encryption` applies reversible Type 7 obfuscation to supported plaintext configuration fields. It is useful only for preventing casual observation and is not equivalent to secure password storage.
+`service password-encryption` applies reversible Type 7 obfuscation to supported plaintext configuration fields. It is useful only for preventing casual observation and is not equivalent to secure password storage. Production devices should use `enable secret`, individual administrator identities, TACACS+ or RADIUS, strong unique credentials, and a controlled credential-management process.
 
 ## SSH key strength and identity
 
@@ -55,10 +55,6 @@ SAM-R2 translates only sources matching `172.31.0.0/16`. The translation table c
 
 A production HSRP design should track upstream interfaces or route reachability. Otherwise, a router can remain active while a different dependency has failed.
 
-## STP and EtherChannel validation limits
-
-The configuration assigns three links to an LACP channel and requests SAM-S7 as VLAN 1 root primary. The source does not include `show etherchannel summary`, `show interfaces port-channel`, or `show spanning-tree` output. Operational bundle formation and root election therefore remain unverified.
-
 ## Syslog time accuracy
 
 The Syslog service receives messages, but the displayed date is in 1993. Reliable incident investigation requires synchronized time. Production routers, switches, servers, and collectors should use a trusted NTP hierarchy and consistent time-zone handling.
@@ -74,4 +70,4 @@ SAM-S4 uses interface VLAN 1 with address `172.19.0.254/16`. VLAN 10 is the perm
 - Replace WPA2-Personal with WPA2/WPA3-Enterprise and centralized authentication.
 - Use dedicated infrastructure and management VLANs rather than VLAN 1.
 - Add explicit device backups, AAA accounting, SNMPv3 or telemetry, NTP, and protected logging transport.
-- Validate HSRP failover, OSPF convergence, STP root state, and EtherChannel formation with operational commands.
+- Test HSRP failover and OSPF convergence under controlled outage conditions before production deployment.
