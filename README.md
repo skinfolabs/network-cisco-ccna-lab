@@ -2154,35 +2154,6 @@ The later stages add encrypted management, access-port protection, HSRP gateway 
 - PAT, HSRP, STP root selection, and LACP EtherChannel
 - Syslog configuration, evidence interpretation, and production-risk analysis
 
-## Repository Structure
-
-```text
-cisco-packet-tracer-enterprise-network-lab/
-|-- README.md
-|-- LICENSE
-|-- IMAGE_MANIFEST.md
-|-- .gitattributes
-|-- docs/
-|   |-- commands.md
-|   `-- notes.md
-|-- configs/
-|   `-- ccna-enterprise-network-lab.pkt
-`-- images/
-    |-- 01-network-topology/
-    |-- 02-dhcp-router-on-a-stick/
-    |-- 03-server-dns-wireless/
-    |-- 04-port-security/
-    |-- 05-ospf-routing/
-    |-- 06-ssh-management/
-    |-- 07-inter-vlan-acls/
-    |-- 08-pat-and-web-validation/
-    |-- 09-hsrp-redundancy/
-    |-- 10-stp-etherchannel/
-    |-- 11-syslog-monitoring/
-    |-- 12-switch-management-acl/
-    `-- 13-source-context/
-```
-
 ## Notes
 
 - Credentials shown in command blocks and screenshots are isolated Packet Tracer laboratory values and must not be reused.
