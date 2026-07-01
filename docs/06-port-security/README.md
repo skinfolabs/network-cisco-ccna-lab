@@ -79,10 +79,6 @@ Gi0/1        1              1            0                  Restrict
 
 <p><sub><strong>Screenshot 019 - Server Room Access Topology:</strong> Laptop and server connections shown around the protected SAM-S4 access switch.</sub></p>
 
-![Routed Core Topology](../../images/04-port-security/03-routed-core-topology.png)
-
-<p><sub><strong>Screenshot 020 - Routed Core Topology:</strong> Transit networks between SAM-R0, SAM-R1, and SAM-R2 before OSPF activation.</sub></p>
-
 ---
 
 ## Validation and Summary

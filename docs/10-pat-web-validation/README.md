@@ -72,37 +72,13 @@ icmp  172.19.0.1:17   172.31.0.1:17   172.19.0.100:17  172.19.0.100:17
 
 ### Step 02 - Validate DNS and HTTP from every client
 
-The wireless laptop and PCs in both user VLANs open `http://www.sam.com` and receive the Packet Tracer web page, validating DNS, routing, ACL allowance for HTTP, and the web service.
+The wireless laptop opens `http://www.sam.com` and receives the Packet Tracer web page, validating DNS, routing, ACL allowance for HTTP, and the web service. The same validation was also completed successfully from the wired clients PC0 through PC5; those repeated browser screenshots are summarized here instead of being shown one by one.
 
 > A browser result confirms application reachability. The PAT translation table remains the separate evidence for address translation.
 
 ![Wireless Web Validation](../../images/08-pat-and-web-validation/02-wireless-web-validation.png)
 
-<p><sub><strong>Screenshot 035 - Wireless Web Validation:</strong> Wireless laptop resolves www.sam.com and loads the Packet Tracer web service.</sub></p>
-
-![PC0 Web Validation](../../images/08-pat-and-web-validation/03-pc0-web-validation.png)
-
-<p><sub><strong>Screenshot 036 - PC0 Web Validation:</strong> PC0 successfully opens www.sam.com.</sub></p>
-
-![PC1 Web Validation](../../images/08-pat-and-web-validation/04-pc1-web-validation.png)
-
-<p><sub><strong>Screenshot 037 - PC1 Web Validation:</strong> PC1 successfully opens www.sam.com.</sub></p>
-
-![PC2 Web Validation](../../images/08-pat-and-web-validation/05-pc2-web-validation.png)
-
-<p><sub><strong>Screenshot 038 - PC2 Web Validation:</strong> PC2 successfully opens www.sam.com.</sub></p>
-
-![PC3 Web Validation](../../images/08-pat-and-web-validation/06-pc3-web-validation.png)
-
-<p><sub><strong>Screenshot 039 - PC3 Web Validation:</strong> PC3 successfully opens www.sam.com.</sub></p>
-
-![PC4 Web Validation](../../images/08-pat-and-web-validation/07-pc4-web-validation.png)
-
-<p><sub><strong>Screenshot 040 - PC4 Web Validation:</strong> PC4 successfully opens www.sam.com.</sub></p>
-
-![PC5 Web Validation](../../images/08-pat-and-web-validation/08-pc5-web-validation.png)
-
-<p><sub><strong>Screenshot 041 - PC5 Web Validation:</strong> PC5 successfully opens www.sam.com.</sub></p>
+<p><sub><strong>Screenshot 035 - Wireless Web Validation:</strong> Wireless laptop resolves www.sam.com and loads the Packet Tracer web service; PC0 through PC5 also successfully opened the same domain.</sub></p>
 
 ---
 

@@ -52,13 +52,31 @@ write memory
 
 ---
 
-### Step 02 - Configure initial local access controls
+### Step 02 - Apply the common management baseline
 
-Console and VTY lines receive the lab password, privileged mode receives an enable secret, and the MOTD banner warns against unauthorized use. `exec-timeout 0 30` closes idle sessions, `no ip domain-lookup` prevents mistyped commands from triggering DNS lookups, and `logging synchronous` keeps messages from interrupting command entry.
+After the hostnames are assigned, the same management baseline is applied to the initial routers and switches. This step prepares the devices for consistent local administration before VLANs, routing, ACLs, Port Security, and redundancy are configured.
+
+The baseline does several things at once:
+
+- `no ip domain-lookup` prevents a mistyped IOS command from being treated as a DNS name.
+- `enable secret Sam1234` protects privileged EXEC mode.
+- `service password-encryption` obfuscates simple line passwords in the running configuration.
+- The MOTD banner displays an authorized-use warning before access.
+- Console settings enable synchronous logging and a short idle timeout.
+- VTY settings allow the early Telnet lab workflow, which is later replaced with SSH.
+
+The same command template is used for the devices below; only `<DEVICE-NAME>` changes.
+
+| Device type | Devices receiving this baseline |
+|-------------|----------------------------------|
+| Routers | `SAM-R0`, `SAM-R1`, `SAM-R2`, `SAM-R3` |
+| Switches | `SAM-S0`, `SAM-S1`, `SAM-S3`, `SAM-S4`, `SAM-S5`, `SAM-S6`, `SAM-S7` |
 
 > The initial `transport input telnet` setting is retained as historical lab evidence. The SSH chapter later replaces it with encrypted management, which is the appropriate operational state.
 
 ```cisco
+configure terminal
+hostname <DEVICE-NAME>
 no ip domain-lookup
 enable secret Sam1234
 service password-encryption
@@ -82,40 +100,15 @@ line vty 0 4
  password Samabcd
  login
  exit
+end
+write memory
 ```
 
----
+`<DEVICE-NAME>` is replaced with each router or switch hostname from the table. The result is a consistent device identity, warning banner, local privilege control, console behavior, and temporary VTY access across the initial lab topology.
 
-### Step 03 - Apply the baseline to the routers
+> Repeated baseline configuration keeps the lab predictable, but every device still needs verification. A missing line on one router or switch can break remote administration, logging readability, or later SSH hardening.
 
-The same baseline from Step 02 is applied to SAM-R0 through SAM-R3. Because only the hostname changes, the router implementation is documented with a device-to-hostname table.
-
-> Repeated configuration should remain consistent, but each device still needs individual verification because a missing line on one router can interrupt remote administration or logging.
-
-| Device | Hostname value |
-|--------|----------------|
-| Router 0 | `SAM-R0` |
-| Router 1 | `SAM-R1` |
-| Router 2 | `SAM-R2` |
-| Router 3 | `SAM-R3` |
-
-`<DEVICE-NAME>` in the Step 02 baseline is replaced with the matching router hostname. Telnet is retained only at this stage and replaced by SSH later.
-
----
-
-### Step 04 - Apply the baseline to the switches
-
-SAM-S0, SAM-S1, and SAM-S3 through SAM-S7 receive the same management baseline for later VLAN, trunk, Port Security, and EtherChannel work.
-
-> Switch management security is independent of data-plane forwarding. A switch can forward frames while still having incomplete or insecure administrative access.
-
-The switch baseline is also identical except for hostname.
-
-| Device group | Hostname values |
-|--------------|-----------------|
-| Initial switches | `SAM-S0`, `SAM-S1`, `SAM-S3`, `SAM-S4`, `SAM-S5`, `SAM-S6`, `SAM-S7` |
-
-`<DEVICE-NAME>` in the Step 02 baseline is replaced with each switch hostname. Telnet is retained only at this stage and replaced by SSH later.
+> **Security Note:** `service password-encryption` is only weak Type 7 obfuscation. It is kept for the lab, but production devices should use SSH-only access, strong secrets, centralized AAA, and protected credential storage.
 
 ---
 

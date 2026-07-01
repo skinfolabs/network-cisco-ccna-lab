@@ -34,6 +34,10 @@ The `172.31.0.0/16` and `209.165.200.0/24` transit networks connect SAM-R0, SAM-
 
 > Dynamic routing cannot repair an incorrect connected-link mask. Both ends must agree on the subnet before a neighbor relationship can form.
 
+![Routed Core Topology](../../images/05-ospf-routing/00-routed-core-topology.png)
+
+<p><sub><strong>Screenshot 020 - Routed Core Topology:</strong> Transit networks between SAM-R0, SAM-R1, and SAM-R2.</sub></p>
+
 #### SAM-R0
 
 SAM-R0 addresses the transit link to SAM-R1 and advertises both user VLANs and the transit network in OSPF area 0.
