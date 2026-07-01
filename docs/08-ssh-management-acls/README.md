@@ -1,12 +1,12 @@
 # SSH Management and Source ACLs
 
-The management plane is migrated from Telnet to SSH version 2. RSA keys and a local user enable encrypted login, while the VTY lines accept only SSH and authenticate against the local username database.
+The management plane moves from Telnet to SSH version 2. RSA keys and a local user enable encrypted login, and VTY lines accept only SSH.
 
 ## Technical Context
 
-An extended ACL on SAM-R0 then permits SSH sourced from VLAN 10 and denies SSH sourced from VLAN 20 while allowing other IP traffic. This separates management authorization from general network connectivity.
+An extended ACL on SAM-R0 permits SSH from VLAN 10, denies SSH from VLAN 20, and allows other IP traffic. This separates management authorization from general connectivity.
 
-> The early SSH examples use 1024-bit RSA keys because they follow the original Packet Tracer exercise. Later devices use the stronger 2048-bit baseline, which is the minimum size this project recommends for production-style configurations together with centralized AAA.
+> Early SSH examples use 1024-bit RSA keys to match the original Packet Tracer task. Later devices use a stronger 2048-bit baseline with a production recommendation for centralized AAA.
 
 **Implemented controls:**
 
@@ -30,11 +30,11 @@ An extended ACL on SAM-R0 then permits SSH sourced from VLAN 10 and denies SSH s
 
 ### Step 01 - Enable SSH and validate encrypted sessions
 
-The devices generate RSA keys, create the local user `Sam`, and configure VTY lines with `transport input ssh` and `login local`. Successful client-to-router and router-to-router sessions show the authorization banner and target prompt.
+Devices generate RSA keys, create local user `Sam`, and set VTY lines to `transport input ssh` with `login local`. Successful sessions show the banner and target prompt.
 
 > `ip domain-name SSH` satisfies the Packet Tracer key-generation prerequisite but is not a production DNS domain design. Real devices should use an organization-controlled domain name.
 
-The SSH baseline is identical on the initial device set. It is documented once here and applied to `SAM-S7`, `SAM-R0` through `SAM-R3`, and `SAM-S0`, `SAM-S1`, `SAM-S3`, `SAM-S4`, `SAM-S5`, and `SAM-S6`.
+The SSH baseline is identical on the initial device set, so it is documented once and applied to the devices below.
 
 | Device role | Devices receiving this SSH baseline |
 |-------------|--------------------------------------|
@@ -68,13 +68,13 @@ write memory
 
 ### Step 02 - Restrict SSH by source subnet
 
-ACL 101 denies TCP destination port 22 from `192.168.20.0/24`, permits it from `192.168.10.0/24`, and then permits all remaining IP traffic. The ACL is applied inbound on both router subinterfaces so the source policy is evaluated as traffic enters SAM-R0.
+ACL 101 denies SSH from `192.168.20.0/24`, permits SSH from `192.168.10.0/24`, and permits remaining IP traffic. It is applied inbound on both router subinterfaces.
 
 > The final `permit ip any any` means this ACL is an SSH-management filter, not a general firewall policy. PC0 succeeds from VLAN 10, while PC2 and PC3 time out from VLAN 20.
 
 #### SAM-R0
 
-ACL 101 allows SSH from VLAN 10, denies SSH from VLAN 20, and preserves all non-SSH IP traffic. It is applied inbound where each user VLAN enters the router.
+ACL 101 allows SSH from VLAN 10, denies SSH from VLAN 20, and preserves non-SSH traffic where each VLAN enters the router.
 
 ```cisco
 configure terminal
@@ -112,27 +112,27 @@ write memory
 
 ## Validation and Summary
 
-SSH management is validated by successful encrypted sessions from permitted sources and denied sessions from VLAN 20 clients. The management ACL limits VTY access by source network, turning remote administration into an explicit management-plane policy.
+Validation confirms successful SSH from permitted sources and denied SSH from VLAN 20. The ACL turns remote administration into an explicit management-plane policy.
 
 ---
 
 ## Project Chapters
 
-| # | Chapter | Description |
-|---|---------|-------------|
-| 0 | [Project Overview](../../README.md) | Main project overview, objectives, tools, and skills |
-| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) | Topology, lab areas, devices, addressing, and traffic relationships |
-| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) | Hostnames, local access, banners, console/VTY baseline, and device setup |
-| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) | VLAN creation, access ports, trunk hardening, and trunk validation |
-| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) | Router subinterfaces, DHCP pools, switch trunk path, and client leases |
-| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) | Static servers, DNS publishing, WLAN profile, WPA2 access, and wireless path validation |
-| 6 | [Access-Layer Port Security](../06-port-security/README.md) | Unused-port shutdown, sticky MAC learning, violation mode, and validation limits |
-| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) | Routed transit links, OSPF advertisements, adjacency validation, and LAN3 expansion |
-| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) | SSH version 2 configuration, management access, and source-based ACL restriction |
-| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) | Inter-VLAN isolation policy and validation of blocked and preserved reachability |
-| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) | PAT configuration on SAM-R2 and client DNS/HTTP validation |
-| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) | Redundant gateway topology, HSRP active/standby roles, and validation limits |
-| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) | STP root control, redundant switching, and LACP EtherChannel configuration |
-| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) | Centralized Syslog destination and event collection validation |
-| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) | Switch SVI management access and VLAN-based SSH allow/deny validation |
-| 15 | [Final Summary](../15-final-summary/README.md) | Validation summary, production recommendations, skills, and project closure |
+| # | Chapter |
+|---|---------|
+| 0 | [Project Overview](../../README.md) |
+| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) |
+| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) |
+| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) |
+| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) |
+| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) |
+| 6 | [Access-Layer Port Security](../06-port-security/README.md) |
+| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) |
+| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) |
+| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) |
+| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) |
+| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) |
+| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) |
+| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) |
+| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) |
+| 15 | [Final Summary](../15-final-summary/README.md) |

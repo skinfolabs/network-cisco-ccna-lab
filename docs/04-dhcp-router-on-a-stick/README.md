@@ -1,12 +1,12 @@
 # DHCP and Router-on-a-Stick Routing
 
-SAM-R0 acts as both the default gateway and DHCP server for VLAN 10 and VLAN 20. Two 802.1Q subinterfaces give the router one Layer 3 address in each VLAN, while separate DHCP pools assign clients the matching gateway and DNS server.
+SAM-R0 acts as the default gateway and DHCP server for VLAN 10 and VLAN 20. Two 802.1Q subinterfaces provide one Layer 3 address per VLAN, while separate DHCP pools assign the matching gateway and DNS server.
 
 ## Technical Context
 
-The switch port toward SAM-R0 is configured as a trunk so tagged frames from both user VLANs can reach the correct router subinterface.
+The switch port toward SAM-R0 is a trunk so tagged frames from both user VLANs reach the correct router subinterface.
 
-> Router-on-a-stick is efficient for a lab and small environment, but all inter-VLAN traffic shares one physical router link. Larger designs commonly use multilayer switching for greater throughput and redundancy.
+> Router-on-a-stick is efficient for a lab, but all inter-VLAN traffic shares one physical router link. Larger designs often use multilayer switching.
 
 **Implemented controls:**
 
@@ -36,7 +36,7 @@ VLAN 10 uses `192.168.10.0/24` with gateway `192.168.10.1`, while VLAN 20 uses `
 
 #### SAM-R0
 
-SAM-R0 creates one tagged gateway and one DHCP pool for each user VLAN. The gateway addresses are excluded so they cannot be leased to clients.
+SAM-R0 creates one tagged gateway and one DHCP pool per user VLAN. Gateway addresses are excluded from leasing.
 
 ```cisco
 configure terminal
@@ -71,13 +71,13 @@ write memory
 
 ### Step 02 - Connect the router through the switch trunk
 
-SAM-S3 FastEthernet0/24 carries the tagged VLAN traffic to SAM-R0. The consolidated command captures show the trunk, subinterface, scope, gateway, DNS, and excluded-address settings together.
+SAM-S3 FastEthernet0/24 carries tagged VLAN traffic to SAM-R0.
 
-> The physical router interface remains shared, but each subinterface processes only frames carrying its configured 802.1Q VLAN tag.
+> The physical router interface is shared, but each subinterface processes only frames with its configured 802.1Q tag.
 
 #### SAM-S3
 
-SAM-S3 FastEthernet0/24 is the static trunk toward SAM-R0, allowing both tagged user VLANs to reach their matching router subinterfaces.
+SAM-S3 FastEthernet0/24 is the static trunk toward SAM-R0.
 
 ```cisco
 configure terminal
@@ -93,7 +93,7 @@ write memory
 
 ### Step 03 - Validate client address allocation
 
-PC0, PC1, and PC5 receive VLAN 10 addresses; PC2, PC3, and PC4 receive VLAN 20 addresses. Every lease shows the expected `/24` mask, local gateway, and DNS server.
+PC0, PC1, and PC5 receive VLAN 10 leases; PC2, PC3, and PC4 receive VLAN 20 leases. Each lease shows the expected `/24` mask, gateway, and DNS server.
 
 > A DHCP lease validates scope delivery. Routing and policy behavior are verified separately with the later ping, SSH, and browser tests.
 
@@ -125,27 +125,27 @@ PC0, PC1, and PC5 receive VLAN 10 addresses; PC2, PC3, and PC4 receive VLAN 20 a
 
 ## Validation and Summary
 
-Router subinterfaces, DHCP pools, and client screenshots validate that VLAN 10 and VLAN 20 receive the expected addresses, gateways, and DNS settings. This confirms that the router-on-a-stick design and trunk path are ready for later ACL, DNS, and web tests.
+Validation confirms that router subinterfaces, DHCP pools, and client leases deliver the expected addresses, gateways, and DNS settings for later ACL, DNS, and web tests.
 
 ---
 
 ## Project Chapters
 
-| # | Chapter | Description |
-|---|---------|-------------|
-| 0 | [Project Overview](../../README.md) | Main project overview, objectives, tools, and skills |
-| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) | Topology, lab areas, devices, addressing, and traffic relationships |
-| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) | Hostnames, local access, banners, console/VTY baseline, and device setup |
-| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) | VLAN creation, access ports, trunk hardening, and trunk validation |
-| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) | Router subinterfaces, DHCP pools, switch trunk path, and client leases |
-| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) | Static servers, DNS publishing, WLAN profile, WPA2 access, and wireless path validation |
-| 6 | [Access-Layer Port Security](../06-port-security/README.md) | Unused-port shutdown, sticky MAC learning, violation mode, and validation limits |
-| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) | Routed transit links, OSPF advertisements, adjacency validation, and LAN3 expansion |
-| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) | SSH version 2 configuration, management access, and source-based ACL restriction |
-| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) | Inter-VLAN isolation policy and validation of blocked and preserved reachability |
-| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) | PAT configuration on SAM-R2 and client DNS/HTTP validation |
-| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) | Redundant gateway topology, HSRP active/standby roles, and validation limits |
-| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) | STP root control, redundant switching, and LACP EtherChannel configuration |
-| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) | Centralized Syslog destination and event collection validation |
-| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) | Switch SVI management access and VLAN-based SSH allow/deny validation |
-| 15 | [Final Summary](../15-final-summary/README.md) | Validation summary, production recommendations, skills, and project closure |
+| # | Chapter |
+|---|---------|
+| 0 | [Project Overview](../../README.md) |
+| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) |
+| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) |
+| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) |
+| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) |
+| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) |
+| 6 | [Access-Layer Port Security](../06-port-security/README.md) |
+| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) |
+| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) |
+| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) |
+| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) |
+| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) |
+| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) |
+| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) |
+| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) |
+| 15 | [Final Summary](../15-final-summary/README.md) |

@@ -9,18 +9,20 @@
 
 ## Project Overview
 
-This project implements a multi-segment Cisco enterprise network in Packet Tracer. The environment combines routed transit networks, two user VLANs, a server LAN, a wireless client path, management-plane controls, dynamic routing, access control, NAT/PAT, redundancy, switching resiliency, and centralized logging.
+This project implements a multi-segment Cisco enterprise network in Packet Tracer. The lab combines routed transit networks, user VLANs, a server LAN, wireless access, management-plane controls, dynamic routing, ACLs, NAT/PAT, redundancy, switching resiliency, and centralized logging.
 
-The configuration progresses from device naming and management access to VLAN segmentation, router-on-a-stick inter-VLAN routing, DHCP, DNS, WPA2-Personal wireless access, OSPF, SSH, ACL enforcement, PAT, HSRP, EtherChannel, STP, and centralized Syslog. Each service is introduced in dependency order so later security and redundancy controls operate on an established addressing and routing foundation.
+The configuration progresses from device naming and management access to VLAN segmentation, router-on-a-stick routing, DHCP, DNS, WPA2-Personal wireless access, OSPF, SSH, ACL enforcement, PAT, HSRP, EtherChannel, STP, and Syslog. Each service is introduced in dependency order so later controls operate on a stable addressing and routing foundation.
 
-The lab demonstrates segmentation, controlled administrative access, unused-port shutdown, sticky Port Security, source-based SSH restrictions, inter-VLAN isolation, encrypted management, gateway redundancy, loop prevention, link aggregation, and event collection. The documented results distinguish configuration evidence from end-to-end validation and retain the limitations of the laboratory tests.
+The lab demonstrates segmentation, controlled administration, unused-port shutdown, sticky Port Security, source-based SSH restrictions, inter-VLAN isolation, encrypted management, gateway redundancy, loop prevention, link aggregation, and event collection. The documentation separates configuration evidence from validation and clearly notes lab-test limits.
+
+> All credentials shown in this repository are lab-only example credentials used inside an isolated learning environment. They are not real production credentials and have no value outside this lab.
 
 ## Objectives
 
 - Build a routed and switched Cisco topology containing user, server, wireless, and transit networks.
 - Segment client traffic with VLANs, 802.1Q trunks, router subinterfaces, and ACLs.
 - Automate client addressing through router-based DHCP and publish an internal web service through DNS.
-- Replace the initial Telnet workflow with SSH version 2 and source-restricted management access.
+- Replace Telnet with SSH version 2 and source-restricted management access.
 - Demonstrate OSPF routing, PAT, HSRP gateway roles, EtherChannel, STP, Port Security, and Syslog.
 - Validate permitted and denied behavior using leases, pings, SSH sessions, browser tests, protocol state, and logs.
 
@@ -51,12 +53,12 @@ The lab demonstrates segmentation, controlled administrative access, unused-port
 - ISR4331 routers and Catalyst 2960 switches
 - VLANs, 802.1Q, DTP controls, router-on-a-stick, and DHCP
 - OSPF, ACLs, PAT, HSRP, STP, and LACP EtherChannel
-- SSH version 2, Port Security, WPA2-Personal, DNS, HTTP, and Syslog
+- SSHv2, Port Security, WPA2-Personal, DNS, HTTP, and Syslog
 
 ## Skills Demonstrated
 
 - Cisco IOS device initialization and management-plane configuration
 - VLAN design, access-port assignment, 802.1Q trunks, and router-on-a-stick
 - DHCP, DNS, wireless access, OSPF, ACLs, PAT, HSRP, STP, and EtherChannel
-- SSH hardening, source-restricted management, Port Security, and Syslog monitoring
+- SSH hardening, source-restricted management, Port Security, and centralized logging
 - Evidence-based validation and production-risk analysis

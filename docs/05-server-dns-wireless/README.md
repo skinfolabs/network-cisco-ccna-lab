@@ -1,6 +1,6 @@
 # Server, DNS, and Wireless Services
 
-LAN2 hosts the DNS and web servers on static addresses so clients and network services can depend on stable endpoints. DNS maps `www.sam.com` to the web server, while the wireless controller and lightweight access point extend VLAN 10 connectivity to a laptop.
+LAN2 hosts DNS and web servers on static addresses. DNS maps `www.sam.com` to the web server, while the wireless controller and lightweight AP extend VLAN 10 connectivity to a laptop.
 
 ## Technical Context
 
@@ -41,7 +41,7 @@ The wireless workflow uses WPA2-Personal in the isolated lab and confirms that t
 
 ### Step 01 - Configure static server addressing
 
-The DNS server uses `172.19.0.100/16` and the web server uses `172.19.0.200/16`; both use `172.19.0.1` as their gateway. The web server points to the DNS server so the same resolver can be used for service testing.
+The DNS server uses `172.19.0.100/16`, the web server uses `172.19.0.200/16`, and both use gateway `172.19.0.1`. The web server points to the lab DNS server for service testing.
 
 > Static service addresses prevent a DNS record or logging destination from becoming stale after a lease change.
 
@@ -57,7 +57,7 @@ The DNS server uses `172.19.0.100/16` and the web server uses `172.19.0.200/16`;
 
 ### Step 02 - Publish the internal web name
 
-Packet Tracer DNS is enabled and an A record maps `www.sam.com` directly to `172.19.0.200`. An A record stores an IPv4 address; it is not a CNAME alias.
+Packet Tracer DNS is enabled, and an A record maps `www.sam.com` to `172.19.0.200`. An A record stores an IPv4 address; it is not a CNAME alias.
 
 > DNS resolution proves name-to-address mapping. The browser tests later confirm that the HTTP service is reachable at the resolved address.
 
@@ -69,7 +69,7 @@ Packet Tracer DNS is enabled and an A record maps `www.sam.com` directly to `172
 
 ### Step 03 - Configure the WLAN profile and obtain a lease
 
-The `SamNet` WLAN uses WPA2-Personal and places the wireless client in the VLAN 10 addressing domain. The laptop receives `192.168.10.5`, gateway `192.168.10.1`, and DNS server `172.19.0.100`.
+The `SamNet` WLAN uses WPA2-Personal and places the laptop in VLAN 10. The laptop receives `192.168.10.5`, gateway `192.168.10.1`, and DNS `172.19.0.100`.
 
 > The controller profile defines wireless authentication and client forwarding; the wired trunk and DHCP configuration still determine whether the client can reach the routed network.
 
@@ -85,9 +85,9 @@ The `SamNet` WLAN uses WPA2-Personal and places the wireless client in the VLAN 
 
 ### Step 04 - Build and validate the wireless client path
 
-FlexConnect options are enabled, a compatible wireless module is installed in the laptop, and the client discovers and joins SamNet through the lightweight access point. The access-point infrastructure address is excluded from the DHCP pool, and the switch links toward the access point and controller are configured as trunks.
+FlexConnect is enabled, a compatible laptop wireless module is installed, and the client joins SamNet through the lightweight AP. The AP infrastructure address is excluded from DHCP, and AP/controller switch links are trunked.
 
-> The visible pre-shared key is retained as laboratory data only. A real key must not be committed to a public repository.
+> The visible pre-shared key is lab-only data. Real wireless keys must not be committed to public repositories.
 
 ![FlexConnect Settings](../../images/03-server-dns-wireless/06-flexconnect-settings.png)
 
@@ -111,7 +111,7 @@ FlexConnect options are enabled, a compatible wireless module is installed in th
 
 #### SAM-R0
 
-The intended access-point address is excluded from DHCP so it remains available for infrastructure use.
+The intended AP address is excluded from DHCP so it remains available for infrastructure use.
 
 ```cisco
 configure terminal
@@ -122,7 +122,7 @@ write memory
 
 #### SAM-S0
 
-SAM-S0 statically trunks the access-point connection and uses VLAN 99 as the native VLAN.
+SAM-S0 trunks the AP connection and uses VLAN 99 as native.
 
 ```cisco
 configure terminal
@@ -136,7 +136,7 @@ write memory
 
 #### SAM-S1
 
-SAM-S1 applies the matching trunk policy to the wireless-controller connection.
+SAM-S1 applies the matching trunk policy to the wireless controller.
 
 ```cisco
 configure terminal
@@ -152,27 +152,27 @@ write memory
 
 ## Validation and Summary
 
-Static server addressing, DNS publishing, WLAN configuration, and wireless client evidence validate the service layer. The wired server network and wireless client path both become usable dependencies for browser, DNS, and reachability testing later in the lab.
+Validation confirms static server addressing, DNS publishing, WLAN configuration, and wireless client connectivity for later browser, DNS, and reachability tests.
 
 ---
 
 ## Project Chapters
 
-| # | Chapter | Description |
-|---|---------|-------------|
-| 0 | [Project Overview](../../README.md) | Main project overview, objectives, tools, and skills |
-| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) | Topology, lab areas, devices, addressing, and traffic relationships |
-| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) | Hostnames, local access, banners, console/VTY baseline, and device setup |
-| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) | VLAN creation, access ports, trunk hardening, and trunk validation |
-| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) | Router subinterfaces, DHCP pools, switch trunk path, and client leases |
-| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) | Static servers, DNS publishing, WLAN profile, WPA2 access, and wireless path validation |
-| 6 | [Access-Layer Port Security](../06-port-security/README.md) | Unused-port shutdown, sticky MAC learning, violation mode, and validation limits |
-| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) | Routed transit links, OSPF advertisements, adjacency validation, and LAN3 expansion |
-| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) | SSH version 2 configuration, management access, and source-based ACL restriction |
-| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) | Inter-VLAN isolation policy and validation of blocked and preserved reachability |
-| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) | PAT configuration on SAM-R2 and client DNS/HTTP validation |
-| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) | Redundant gateway topology, HSRP active/standby roles, and validation limits |
-| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) | STP root control, redundant switching, and LACP EtherChannel configuration |
-| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) | Centralized Syslog destination and event collection validation |
-| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) | Switch SVI management access and VLAN-based SSH allow/deny validation |
-| 15 | [Final Summary](../15-final-summary/README.md) | Validation summary, production recommendations, skills, and project closure |
+| # | Chapter |
+|---|---------|
+| 0 | [Project Overview](../../README.md) |
+| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) |
+| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) |
+| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) |
+| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) |
+| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) |
+| 6 | [Access-Layer Port Security](../06-port-security/README.md) |
+| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) |
+| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) |
+| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) |
+| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) |
+| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) |
+| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) |
+| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) |
+| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) |
+| 15 | [Final Summary](../15-final-summary/README.md) |

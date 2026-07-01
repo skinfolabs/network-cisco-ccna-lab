@@ -1,12 +1,12 @@
 # Topology and Lab Environment
 
-This chapter defines the Cisco Packet Tracer lab before the configuration chapters begin. The topology shows how the routed, switched, wireless, server, transit, and redundancy segments relate to each other, while the lab environment tables document the devices, subnets, and services used throughout the project.
+This chapter defines the Packet Tracer topology, devices, subnets, and services used throughout the project.
 
 ## Topology
 
-The network is organized into three operational areas. LAN1 contains the routed user VLANs and wireless infrastructure, LAN2 contains the DNS and internal web services, and LAN3 introduces the redundant gateway and switching path. Routed transit networks connect these areas and provide the foundation for OSPF routing, PAT, inter-VLAN access control, and end-to-end service validation.
+The network has three areas: LAN1 for user VLANs and wireless access, LAN2 for DNS and web services, and LAN3 for redundancy. Routed transit networks connect these areas for OSPF, PAT, ACLs, and end-to-end validation.
 
-Addressing is intentionally visible because DHCP scopes, ACL wildcard masks, PAT source classification, OSPF network advertisements, and HSRP virtual addresses all depend on consistent subnet boundaries. The topology gives the reader the map first, then the later chapters prove that routing, segmentation, security controls, and redundancy work as expected.
+Addressing is intentionally visible because DHCP scopes, ACL wildcard masks, PAT classification, OSPF advertisements, and HSRP virtual IPs depend on consistent subnet boundaries.
 
 > A topology diagram establishes the intended design and traffic relationships. Command output, client tests, browser checks, and protocol state are used later to validate the actual operational behavior.
 
@@ -24,7 +24,7 @@ Addressing is intentionally visible because DHCP scopes, ACL wildcard masks, PAT
 
 ## Lab Environment
 
-The lab uses Cisco Packet Tracer with ISR4331 routers, Catalyst 2960 switches, a wireless LAN controller, a lightweight access point, two servers, wired PCs, and a wireless laptop. The supplied Packet Tracer file is retained in [configs/ccna-enterprise-network-lab.pkt](../../configs/ccna-enterprise-network-lab.pkt) as the original lab artifact.
+The lab uses Cisco Packet Tracer with ISR4331 routers, Catalyst 2960 switches, a wireless LAN controller, a lightweight AP, two servers, wired PCs, and a wireless laptop. The Packet Tracer file is retained in [configs/ccna-enterprise-network-lab.pkt](../../configs/ccna-enterprise-network-lab.pkt).
 
 | Component | Description |
 |-----------|-------------|
@@ -39,27 +39,27 @@ The lab uses Cisco Packet Tracer with ISR4331 routers, Catalyst 2960 switches, a
 | LAN3 | `10.10.10.0/24`; R3 `10.10.10.1`, R4 `10.10.10.2`, HSRP VIP `10.10.10.222` |
 | Wireless | `SamNet` using WPA2-Personal; wireless clients join the VLAN 10 addressing domain |
 
-> The usernames and passwords are intentionally shown openly because this is an isolated Packet Tracer lab and the visible values make the configuration reproducible for learning and review. They are not real credentials and must not be reused on production devices.
+> Usernames and passwords are shown because this is an isolated Packet Tracer lab. They are not real credentials and must not be reused on production devices.
 
 ---
 
 ## Project Chapters
 
-| # | Chapter | Description |
-|---|---------|-------------|
-| 0 | [Project Overview](../../README.md) | Main project overview, objectives, tools, and skills |
-| 1 | [Topology and Lab Environment](README.md) | Topology, lab areas, devices, addressing, and traffic relationships |
-| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) | Hostnames, local access, banners, console/VTY baseline, and device setup |
-| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) | VLAN creation, access ports, trunk hardening, and trunk validation |
-| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) | Router subinterfaces, DHCP pools, switch trunk path, and client leases |
-| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) | Static servers, DNS publishing, WLAN profile, WPA2 access, and wireless path validation |
-| 6 | [Access-Layer Port Security](../06-port-security/README.md) | Unused-port shutdown, sticky MAC learning, violation mode, and validation limits |
-| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) | Routed transit links, OSPF advertisements, adjacency validation, and LAN3 expansion |
-| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) | SSH version 2 configuration, management access, and source-based ACL restriction |
-| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) | Inter-VLAN isolation policy and validation of blocked and preserved reachability |
-| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) | PAT configuration on SAM-R2 and client DNS/HTTP validation |
-| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) | Redundant gateway topology, HSRP active/standby roles, and validation limits |
-| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) | STP root control, redundant switching, and LACP EtherChannel configuration |
-| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) | Centralized Syslog destination and event collection validation |
-| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) | Switch SVI management access and VLAN-based SSH allow/deny validation |
-| 15 | [Final Summary](../15-final-summary/README.md) | Validation summary, production recommendations, skills, and project closure |
+| # | Chapter |
+|---|---------|
+| 0 | [Project Overview](../../README.md) |
+| 1 | [Topology and Lab Environment](README.md) |
+| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) |
+| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) |
+| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) |
+| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) |
+| 6 | [Access-Layer Port Security](../06-port-security/README.md) |
+| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) |
+| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) |
+| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) |
+| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) |
+| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) |
+| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) |
+| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) |
+| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) |
+| 15 | [Final Summary](../15-final-summary/README.md) |

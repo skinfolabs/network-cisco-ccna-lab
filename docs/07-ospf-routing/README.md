@@ -1,10 +1,10 @@
 # OSPF Dynamic Routing
 
-OSPF area 0 connects the user VLANs, routed transit links, server LAN, and later LAN3 networks. The routers advertise their directly connected prefixes and form FULL neighbor adjacencies over the transit segments.
+OSPF area 0 connects the user VLANs, transit links, server LAN, and later LAN3 networks. Routers advertise connected prefixes and form FULL adjacencies over transit segments.
 
 ## Technical Context
 
-The initial three-router design is expanded through the `192.168.13.0/24` link to SAM-R3, which also advertises `10.10.10.0/24`. This prepares the network for HSRP and the redundant LAN3 path.
+The initial three-router design expands through `192.168.13.0/24` to SAM-R3, which also advertises `10.10.10.0/24` for the later LAN3 and HSRP path.
 
 > OSPF router IDs can appear as an address from another interface, so a neighbor ID does not have to match the connected-link address. Production OSPF should also use explicit passive interfaces and authentication where supported.
 
@@ -30,7 +30,7 @@ The initial three-router design is expanded through the `192.168.13.0/24` link t
 
 ### Step 01 - Address the core transit links
 
-The `172.31.0.0/16` and `209.165.200.0/24` networks connect SAM-R0, SAM-R1, and SAM-R2. Each side receives a unique address before OSPF is enabled.
+The `172.31.0.0/16` and `209.165.200.0/24` transit networks connect SAM-R0, SAM-R1, and SAM-R2. Each side receives an address before OSPF is enabled.
 
 > Dynamic routing cannot repair an incorrect connected-link mask. Both ends must agree on the subnet before a neighbor relationship can form.
 
@@ -76,7 +76,7 @@ write memory
 
 #### SAM-R2
 
-SAM-R2 addresses the link toward SAM-R1 and the server-facing LAN. The `172.19.0.1/16` address becomes the default gateway for the DNS, web, and Syslog services documented in the server chapter.
+SAM-R2 addresses the SAM-R1 transit link and the server LAN. `172.19.0.1/16` becomes the gateway for DNS, web, and Syslog services.
 
 ```cisco
 configure terminal
@@ -96,15 +96,15 @@ end
 write memory
 ```
 
-After the network statements are added, the routers report FULL OSPF adjacency and the server LAN becomes reachable through the routed path.
+After the network statements are added, routers report FULL OSPF adjacency and the server LAN becomes reachable.
 
 ---
 
 ### Step 02 - Advertise the initial networks and validate adjacency
 
-SAM-R0 advertises both user VLANs and the R0-R1 transit, SAM-R1 advertises both transit networks, and SAM-R2 advertises the R1-R2 transit and server LAN. FULL adjacency messages confirm neighbor formation, while the DNS-server ping confirms routed reachability after an initial timeout.
+SAM-R0 advertises user VLANs and the R0-R1 transit, SAM-R1 advertises both transit networks, and SAM-R2 advertises the R1-R2 transit plus server LAN. FULL adjacency confirms neighbor formation, while the DNS-server ping confirms reachability after an initial timeout.
 
-> The lab uses `passive-interface g0/0/0` on a router with subinterfaces. In production, the exact user-facing subinterfaces should be made passive explicitly, or `passive-interface default` should be combined with selected `no passive-interface` transit links.
+> With router subinterfaces, production OSPF should make user-facing subinterfaces passive explicitly or use `passive-interface default` with selected transit links enabled.
 
 ![DNS Server Ping](../../images/05-ospf-routing/01-dns-server-ping.png)
 
@@ -114,9 +114,9 @@ SAM-R0 advertises both user VLANs and the R0-R1 transit, SAM-R1 advertises both 
 
 ### Step 03 - Extend OSPF to SAM-R3 and LAN3
 
-SAM-R1 and SAM-R3 receive addresses in `192.168.13.0/24`, and SAM-R3 also receives `10.10.10.1/24` for LAN3. Both networks are then advertised in area 0; the incomplete first OSPF entry is retained as an intermediate command attempt followed by the completed syntax.
+SAM-R1 and SAM-R3 receive `192.168.13.0/24` addresses, and SAM-R3 receives `10.10.10.1/24` for LAN3. Both networks are advertised in area 0.
 
-> Error output is useful evidence when the corrected command is shown immediately afterward. It demonstrates the final accepted syntax without hiding the troubleshooting path.
+> Error output can be useful when the corrected command follows immediately, because it preserves the troubleshooting path and final syntax.
 
 ![SAM-R1 to SAM-R3 Expansion](../../images/05-ospf-routing/02-sam-r1-r3-expansion-topology.png)
 
@@ -164,27 +164,27 @@ write memory
 
 ## Validation and Summary
 
-OSPF is validated through interface addressing, network advertisements, adjacency state, and routed reachability to the server LAN. The later LAN3 expansion shows how the routing domain grows when SAM-R3 and the 192.168.13.0/24 transit are added.
+Validation confirms interface addressing, OSPF advertisements, adjacency state, server-LAN reachability, and the later LAN3 expansion.
 
 ---
 
 ## Project Chapters
 
-| # | Chapter | Description |
-|---|---------|-------------|
-| 0 | [Project Overview](../../README.md) | Main project overview, objectives, tools, and skills |
-| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) | Topology, lab areas, devices, addressing, and traffic relationships |
-| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) | Hostnames, local access, banners, console/VTY baseline, and device setup |
-| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) | VLAN creation, access ports, trunk hardening, and trunk validation |
-| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) | Router subinterfaces, DHCP pools, switch trunk path, and client leases |
-| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) | Static servers, DNS publishing, WLAN profile, WPA2 access, and wireless path validation |
-| 6 | [Access-Layer Port Security](../06-port-security/README.md) | Unused-port shutdown, sticky MAC learning, violation mode, and validation limits |
-| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) | Routed transit links, OSPF advertisements, adjacency validation, and LAN3 expansion |
-| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) | SSH version 2 configuration, management access, and source-based ACL restriction |
-| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) | Inter-VLAN isolation policy and validation of blocked and preserved reachability |
-| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) | PAT configuration on SAM-R2 and client DNS/HTTP validation |
-| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) | Redundant gateway topology, HSRP active/standby roles, and validation limits |
-| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) | STP root control, redundant switching, and LACP EtherChannel configuration |
-| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) | Centralized Syslog destination and event collection validation |
-| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) | Switch SVI management access and VLAN-based SSH allow/deny validation |
-| 15 | [Final Summary](../15-final-summary/README.md) | Validation summary, production recommendations, skills, and project closure |
+| # | Chapter |
+|---|---------|
+| 0 | [Project Overview](../../README.md) |
+| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) |
+| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) |
+| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) |
+| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) |
+| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) |
+| 6 | [Access-Layer Port Security](../06-port-security/README.md) |
+| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) |
+| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) |
+| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) |
+| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) |
+| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) |
+| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) |
+| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) |
+| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) |
+| 15 | [Final Summary](../15-final-summary/README.md) |
