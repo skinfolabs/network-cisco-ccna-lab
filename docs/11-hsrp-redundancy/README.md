@@ -2,6 +2,8 @@
 
 SAM-R4 and SAM-S8 extend the topology so SAM-R3 and SAM-R4 can share virtual gateways on `192.168.13.0/24` and `10.10.10.0/24`. OSPF advertises the additional router, and HSRP priorities make SAM-R3 active while SAM-R4 remains standby.
 
+## Technical Context
+
 Clients use the virtual IP rather than either router's physical address. Preemption allows the preferred higher-priority router to reclaim the active role after it returns.
 
 > The captured outputs validate HSRP roles and normal-path connectivity, but they do not show SAM-R3 being disabled and SAM-R4 becoming active. The project therefore documents configured redundancy without claiming a completed failover test.
@@ -22,7 +24,11 @@ Clients use the virtual IP rather than either router's physical address. Preempt
 | Standby router | The router waiting to take over if the active router fails. |
 | Preemption | A setting that allows the preferred router to reclaim the active role after it returns. |
 
-### Add the redundant router and switch
+---
+
+## Detailed Walkthrough
+
+### Step 01 - Add the redundant router and switch
 
 The expanded topology introduces SAM-R4 as an alternate gateway and SAM-S8 as an additional switching component. Both receive the same management baseline and SSH-only administration used elsewhere in the lab.
 
@@ -32,13 +38,16 @@ The expanded topology introduces SAM-R4 as an alternate gateway and SAM-S8 as an
 
 <p><sub><strong>Screenshot 042 - Expanded HSRP Topology:</strong> Router4 and Switch8 added to provide an alternate routed path for the two shared LANs.</sub></p>
 
-#### SAM-R4
+The same management baseline is applied to the two newly introduced devices. Only the hostname changes between the router and the switch.
 
-This is the complete initial management baseline for router `SAM-R4`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
+| New device | Hostname value |
+|------------|----------------|
+| Router 4 | `SAM-R4` |
+| Switch 8 | `SAM-S8` |
 
 ```cisco
 configure terminal
-hostname SAM-R4
+hostname <DEVICE-NAME>
 no ip domain-lookup
 enable secret Sam1234
 service password-encryption
@@ -66,62 +75,9 @@ end
 write memory
 ```
 
-#### SAM-R4
+`<DEVICE-NAME>` is replaced with `SAM-R4` or `SAM-S8`. This baseline still includes the temporary Telnet transport inherited from the early lab workflow, and the next command block replaces VTY access with SSH.
 
-`SAM-R4` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
-
-```cisco
-configure terminal
-ip domain-name SSH
-crypto key generate rsa
-! Enter 2048 when IOS requests the modulus size.
-username Sam secret Samabcd
-line vty 0 4
- transport input ssh
- login local
- exit
-ip ssh version 2
-end
-write memory
-```
-
-#### SAM-S8
-
-This is the complete initial management baseline for switch `SAM-S8`. Telnet is retained only at this stage of the lab and is replaced by SSH later.
-
-```cisco
-configure terminal
-hostname SAM-S8
-no ip domain-lookup
-enable secret Sam1234
-service password-encryption
-banner motd $
-****************************************
-* Welcome to Cisco Device.             *
-* Authorized Access Only.              *
-* This device is the property of -     *
-* Samuel Kim!                          *
-* Unauthorized access is prohibited!! *
-****************************************
-$
-line console 0
- logging synchronous
- exec-timeout 0 30
- password Samabcd
- login
- exit
-line vty 0 4
- transport input telnet
- password Samabcd
- login
- exit
-end
-write memory
-```
-
-#### SAM-S8
-
-`SAM-S8` receives a local laboratory administrator, RSA keys, SSH version 2, and SSH-only VTY transport.
+Both new devices receive the same stronger SSH baseline with a 2048-bit RSA key request. The command sequence is identical for `SAM-R4` and `SAM-S8`.
 
 ```cisco
 configure terminal
@@ -138,7 +94,9 @@ end
 write memory
 ```
 
-### Address SAM-R4 and advertise its networks
+---
+
+### Step 02 - Address SAM-R4 and advertise its networks
 
 SAM-R4 receives `10.10.10.2/24` on LAN3 and `192.168.13.3/24` on the transit network. OSPF area 0 advertises both networks, and a successful ping confirms reachability to the new router address.
 
@@ -170,7 +128,9 @@ write memory
 
 <p><sub><strong>Screenshot 043 - SAM-R4 Ping Validation:</strong> PC0 successfully pings the new SAM-R4 transit address.</sub></p>
 
-### Configure the HSRP virtual gateways
+---
+
+### Step 03 - Configure the HSRP virtual gateways
 
 HSRP group 1 uses virtual IP `192.168.13.222`, and group 2 uses `10.10.10.222`. SAM-R3 has priority 150 and SAM-R4 priority 100, with preemption enabled on both routers.
 
@@ -218,7 +178,9 @@ end
 write memory
 ```
 
-### Validate active and standby state
+---
+
+### Step 04 - Validate active and standby state
 
 PC6 uses the LAN3 virtual IP as its default gateway. `show standby brief` identifies SAM-R3 as active and SAM-R4 as standby for both groups, while ping and traceroute demonstrate normal connectivity through the active path.
 
@@ -252,26 +214,31 @@ Gi0/0/1    2    150  P  Active  local   10.10.10.2    10.10.10.222
 
 <p><sub><strong>Screenshot 047 - PC4 Routed Path Validation:</strong> A second client validates normal connectivity across the HSRP-enabled topology.</sub></p>
 
----------
+---
+
+## Validation and Summary
+
+HSRP is validated by active and standby role output plus client gateway configuration using the virtual IP. Failover is not claimed because the evidence shows normal active/standby state rather than a captured failure test.
 
 ---
 
 ## Project Chapters
 
-| Chapter | Description |
-|---------|-------------|
-| [Project Overview](../../README.md) | Main project overview, topology, environment, objectives, and outcomes |
-| [Device Identity and Management Foundation](../01-device-identity-management/README.md) | Hostnames, local access, banners, console/VTY baseline, and device setup |
-| [VLAN Segmentation and Trunk Hardening](../02-vlan-segmentation-trunking/README.md) | VLAN creation, access ports, trunk hardening, and trunk validation |
-| [DHCP and Router-on-a-Stick Routing](../03-dhcp-router-on-a-stick/README.md) | Router subinterfaces, DHCP pools, switch trunk path, and client leases |
-| [Server, DNS, and Wireless Services](../04-server-dns-wireless/README.md) | Static servers, DNS publishing, WLAN profile, WPA2 access, and wireless path validation |
-| [Access-Layer Port Security](../05-port-security/README.md) | Unused-port shutdown, sticky MAC learning, violation mode, and validation limits |
-| [OSPF Dynamic Routing](../06-ospf-routing/README.md) | Routed transit links, OSPF advertisements, adjacency validation, and LAN3 expansion |
-| [SSH Management and Source ACLs](../07-ssh-management-acls/README.md) | SSH version 2 configuration, management access, and source-based ACL restriction |
-| [Inter-VLAN Access Control](../08-inter-vlan-access-control/README.md) | Inter-VLAN isolation policy and validation of blocked and preserved reachability |
-| [PAT and Internal Web Validation](../09-pat-web-validation/README.md) | PAT configuration on SAM-R2 and client DNS/HTTP validation |
-| [HSRP Gateway Redundancy](../10-hsrp-redundancy/README.md) | Redundant gateway topology, HSRP active/standby roles, and validation limits |
-| [STP and LACP EtherChannel](../11-stp-etherchannel/README.md) | STP root control, redundant switching, and LACP EtherChannel configuration |
-| [Centralized Syslog Monitoring](../12-syslog-monitoring/README.md) | Centralized Syslog destination and event collection validation |
-| [Source-Restricted Switch Management](../13-switch-management-acl/README.md) | Switch SVI management access and VLAN-based SSH allow/deny validation |
-| [Testing, Results, and Recommendations](../14-testing-results-summary/README.md) | Confirmed results, skills demonstrated, limitations, and production recommendations |
+| # | Chapter | Description |
+|---|---------|-------------|
+| 0 | [Project Overview](../../README.md) | Main project overview, objectives, tools, and skills |
+| 1 | [Topology and Lab Environment](../01-topology-and-lab-environment/README.md) | Topology, lab areas, devices, addressing, and traffic relationships |
+| 2 | [Device Identity and Management Foundation](../02-device-identity-management/README.md) | Hostnames, local access, banners, console/VTY baseline, and device setup |
+| 3 | [VLAN Segmentation and Trunk Hardening](../03-vlan-segmentation-trunking/README.md) | VLAN creation, access ports, trunk hardening, and trunk validation |
+| 4 | [DHCP and Router-on-a-Stick Routing](../04-dhcp-router-on-a-stick/README.md) | Router subinterfaces, DHCP pools, switch trunk path, and client leases |
+| 5 | [Server, DNS, and Wireless Services](../05-server-dns-wireless/README.md) | Static servers, DNS publishing, WLAN profile, WPA2 access, and wireless path validation |
+| 6 | [Access-Layer Port Security](../06-port-security/README.md) | Unused-port shutdown, sticky MAC learning, violation mode, and validation limits |
+| 7 | [OSPF Dynamic Routing](../07-ospf-routing/README.md) | Routed transit links, OSPF advertisements, adjacency validation, and LAN3 expansion |
+| 8 | [SSH Management and Source ACLs](../08-ssh-management-acls/README.md) | SSH version 2 configuration, management access, and source-based ACL restriction |
+| 9 | [Inter-VLAN Access Control](../09-inter-vlan-access-control/README.md) | Inter-VLAN isolation policy and validation of blocked and preserved reachability |
+| 10 | [PAT and Internal Web Validation](../10-pat-web-validation/README.md) | PAT configuration on SAM-R2 and client DNS/HTTP validation |
+| 11 | [HSRP Gateway Redundancy](../11-hsrp-redundancy/README.md) | Redundant gateway topology, HSRP active/standby roles, and validation limits |
+| 12 | [STP and LACP EtherChannel](../12-stp-etherchannel/README.md) | STP root control, redundant switching, and LACP EtherChannel configuration |
+| 13 | [Centralized Syslog Monitoring](../13-syslog-monitoring/README.md) | Centralized Syslog destination and event collection validation |
+| 14 | [Source-Restricted Switch Management](../14-switch-management-acl/README.md) | Switch SVI management access and VLAN-based SSH allow/deny validation |
+| 15 | [Final Summary](../15-final-summary/README.md) | Validation summary, production recommendations, skills, and project closure |
